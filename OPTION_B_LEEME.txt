@@ -1,0 +1,20 @@
+ZERO Y NANY - SHOP | OPCIÓN B: PANEL PREMIUM
+
+Archivos principales actualizados:
+- admin.html: estructura visual de administración, usuarios y diseñador.
+- styles.css: estilos premium, responsive y optimizados para celular.
+- js/admin.js: vista previa de portada, estado de cambios, búsqueda de integrantes y contadores de roles.
+
+Instalación:
+1. Conserva una copia de seguridad del proyecto actual.
+2. Sustituye admin.html por este archivo.
+3. Sustituye styles.css por este archivo.
+4. Sustituye js/admin.js por este archivo.
+5. No borres config.js, js/supabase-client.js, js/store.js, index.html, ni las carpetas supabase/assets.
+6. Sube los cambios al repositorio conectado a Vercel para publicar.
+
+Importante:
+- Esta actualización mejora la interfaz y las interacciones del panel.
+- La gestión de usuarios requiere que la función Supabase Edge Function manage-team esté desplegada.
+- El guardado del diseñador requiere la migración SQL designer-migration.sql y la función save_zero_shop_design.
+- No compartas service_role ni sb_secret keys.

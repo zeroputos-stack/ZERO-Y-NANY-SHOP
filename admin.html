@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090812">
+  <title>ZERO Y NANY - SHOP | Administración</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-body">
+  <div class="admin-topline"></div>
+  <main class="admin-page">
+    <section id="loginPanel" class="login-card">
+      <a class="brand" href="./"><span class="brand-crown">♛</span><span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span></a>
+      <span class="eyebrow">ZONA PRIVADA</span>
+      <h1>Panel administrativo</h1>
+      <p>Inicia sesión con una cuenta administradora o editora autorizada de ZERO Y NANY - SHOP.</p>
+      <form id="loginForm">
+        <label>Correo electrónico<input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@tutienda.com"></label>
+        <label>Contraseña<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Tu contraseña"></label>
+        <button class="btn btn-primary btn-block" id="loginBtn" type="submit">Entrar al panel</button>
+      </form>
+      <div id="loginMessage" class="form-message" role="status"></div>
+      <a class="back-store" href="./">← Volver a la tienda</a>
+      <small class="security-tip">El acceso se valida en Supabase. No hay PIN administrativo dentro del HTML.</small>
+    </section>
+
+    <section id="passwordSetupPanel" class="login-card" hidden>
+      <a class="brand" href="./"><span class="brand-crown">♛</span><span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span></a>
+      <span class="eyebrow">ACTIVAR CUENTA</span>
+      <h1>Configura tu contraseña</h1>
+      <p>Elige una contraseña segura para acceder al panel de la tienda.</p>
+      <form id="setupPasswordForm">
+        <label>Nueva contraseña<input id="newTeamPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres"></label>
+        <label>Confirmar contraseña<input id="confirmTeamPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Repite tu contraseña"></label>
+        <button class="btn btn-primary btn-block" id="saveTeamPasswordBtn" type="submit">Guardar contraseña</button>
+      </form>
+      <div id="passwordSetupMessage" class="form-message" role="status"></div>
+    </section>
+
+    <section id="adminApp" class="admin-app" hidden>
+      <header class="admin-header">
+        <a class="brand" href="./"><span class="brand-crown">♛</span><span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span></a>
+        <div class="admin-user"><span id="adminEmailLabel"></span><button id="logoutBtn" class="btn btn-soft btn-sm">Cerrar sesión</button></div>
+      </header>
+      <div class="admin-layout">
+        <aside class="admin-sidebar">
+          <span class="eyebrow">CONTROL CENTER</span>
+          <button class="admin-nav active" data-tab="dashboard">▦ Resumen</button>
+          <button class="admin-nav" data-tab="products">▤ Productos</button>
+          <button class="admin-nav" data-tab="orders">▣ Pedidos <b id="pendingOrderBadge">0</b></button>
+          <button class="admin-nav" data-tab="settings">⚙ Ajustes</button>
+          <button class="admin-nav" data-tab="designer">✦ Diseñador visual</button>
+          <button class="admin-nav" data-tab="team" id="teamNav">♙ Usuarios y permisos</button>
+          <a href="./" class="admin-nav admin-back">↗ Ver tienda</a>
+        </aside>
+
+        <div class="admin-content">
+          <section class="admin-tab active" id="tab-dashboard">
+            <div class="admin-title"><div><span class="eyebrow">ZERO Y NANY - SHOP / CONTROL CENTER</span><h1>Resumen general</h1></div><button id="refreshDashboard" class="btn btn-soft">↻ Actualizar</button></div>
+            <div class="metric-grid">
+              <article><span>Productos activos</span><strong id="metricProducts">—</strong></article>
+              <article><span>Pedidos nuevos</span><strong id="metricOrders">—</strong></article>
+              <article><span>Pagos pendientes</span><strong id="metricPayments">—</strong></article>
+              <article><span>Ventas confirmadas</span><strong id="metricSales">$0</strong></article>
+            </div>
+            <div class="panel-card"><div class="panel-card-head"><div><h2>Actividad reciente</h2><p>Los pedidos más recientes aparecerán aquí.</p></div><button class="btn btn-soft btn-sm" data-go-tab="orders">Ver pedidos</button></div><div id="recentOrders" class="recent-orders"></div></div>
+          </section>
+
+          <section class="admin-tab" id="tab-products">
+            <div class="admin-title"><div><span class="eyebrow">CATÁLOGO</span><h1>Productos e inventario</h1><p>Agrega productos, modifica precios, existencias e imágenes.</p></div></div>
+            <div class="admin-columns">
+              <form id="productForm" class="panel-card product-editor">
+                <div class="panel-card-head"><div><h2 id="productFormTitle">Agregar producto</h2><p>La imagen se almacena en la nube.</p></div><span class="editor-icon">✦</span></div>
+                <input type="hidden" id="productId">
+                <label>Categoría / plataforma<input id="productCategory" required maxlength="80" placeholder="Ej. Accesorios"></label>
+                <label>Nombre del producto<input id="productName" required maxlength="120" placeholder="Ej. Producto digital"></label>
+                <div class="two-fields">
+                  <label>Duración<input id="productDuration" maxlength="60" placeholder="1 mes"></label>
+                  <label>Modalidad<input id="productModality" maxlength="80" placeholder="Individual / Completa"></label>
+                </div>
+                <label>Descripción<textarea id="productDescription" rows="2" maxlength="500" placeholder="Detalles que verá el cliente"></textarea></label>
+                <div class="two-fields">
+                  <label>Precio (MXN)<input id="productPrice" type="number" min="0" step="0.01" required></label>
+                  <label>Stock<input id="productStock" type="number" min="0" step="1" placeholder="Vacío = por confirmar"></label>
+                </div>
+                <label class="switch-line"><input id="productActive" type="checkbox" checked> Mostrar en la tienda</label>
+                <div class="image-uploader">
+                  <label for="productImage">Foto o sticker del producto</label>
+                  <input id="productImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+                  <div id="imagePreview" class="image-preview"><span>▧</span><b>Vista previa</b><small>JPG, PNG, WEBP o GIF · máximo 5 MB</small></div>
+                  <button id="removeImageBtn" type="button" class="btn btn-soft btn-sm" hidden>Quitar imagen</button>
+                </div>
+                <div class="form-actions"><button class="btn btn-primary" id="saveProductBtn" type="submit">Guardar producto</button><button class="btn btn-soft" id="resetProductBtn" type="button">Limpiar</button></div>
+                <div id="productMessage" class="form-message"></div>
+              </form>
+              <div class="panel-card product-list-card">
+                <div class="panel-card-head"><div><h2>Catálogo actual</h2><p id="productCountLabel">Cargando…</p></div><button id="exportProductsBtn" class="btn btn-soft btn-sm">Exportar CSV</button></div>
+                <div class="list-tools"><input id="productSearch" type="search" placeholder="Buscar producto…"><button id="selectAllBtn" class="btn btn-soft btn-sm">Seleccionar todo</button></div>
+                <div class="bulk-bar"><span id="selectedCount">0 seleccionados</span><button id="deleteSelectedBtn" class="btn btn-danger btn-sm" disabled>Eliminar seleccionados</button><label class="btn btn-soft btn-sm import-label">Importar CSV<input id="importCsv" type="file" accept=".csv,text/csv" hidden></label></div>
+                <div id="adminProductList" class="admin-product-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-tab" id="tab-orders">
+            <div class="admin-title"><div><span class="eyebrow">VENTAS</span><h1>Pedidos</h1><p>Consulta, confirma y actualiza el estado de cada pedido.</p></div><button id="refreshOrders" class="btn btn-soft">↻ Actualizar</button></div>
+            <div class="order-filters"><select id="orderStatusFilter"><option value="">Todos los estados</option><option value="new">Nuevos</option><option value="confirmed">Confirmados</option><option value="preparing">En preparación</option><option value="completed">Completados</option><option value="cancelled">Cancelados</option></select><select id="paymentFilter"><option value="">Todos los pagos</option><option value="pending">Pago pendiente</option><option value="paid">Pagado</option><option value="refunded">Reembolsado</option></select></div>
+            <div id="ordersList" class="orders-list"></div>
+          </section>
+
+          <section class="admin-tab" id="tab-settings">
+            <div class="admin-title"><div><span class="eyebrow">CONFIGURACIÓN</span><h1>Datos de la tienda</h1><p>Estos datos se muestran a los clientes.</p></div></div>
+            <form id="settingsForm" class="panel-card settings-form">
+              <label>Nombre de la tienda<input id="settingStoreName" required maxlength="80"></label>
+              <label>WhatsApp de atención (con código de país)<input id="settingWhatsapp" required maxlength="20" placeholder="526623459707"></label>
+              <label>Instrucciones de pago<textarea id="settingPayment" rows="4" maxlength="1000"></textarea></label>
+              <label>Anuncio principal<textarea id="settingAnnouncement" rows="2" maxlength="240"></textarea></label>
+              <button class="btn btn-primary" type="submit">Guardar configuración</button>
+              <div id="settingsMessage" class="form-message"></div>
+            </form>
+          </section>
+
+          <section class="admin-tab" id="tab-team">
+            <div class="feature-banner team-feature-banner">
+              <div class="feature-banner-copy">
+                <span class="eyebrow">CONTROL DE ACCESO · EQUIPO</span>
+                <h1>Usuarios y permisos</h1>
+                <p>Invita personas, asigna responsabilidades y mantén el control de quién puede administrar ZERO Y NANY - SHOP.</p>
+                <div class="feature-pills"><span>✦ Acceso seguro</span><span>♙ Roles personalizados</span><span>✓ Control administrativo</span></div>
+              </div>
+              <div class="feature-banner-art" aria-hidden="true"><span>♙</span><i>✦</i><b>TEAM</b></div>
+            </div>
+            <div class="team-stat-grid" id="teamStats">
+              <article class="team-stat-card team-stat-admin"><span class="team-stat-icon">♛</span><div><small>Administradores</small><strong id="teamAdminCount">—</strong><span>Control total</span></div></article>
+              <article class="team-stat-card team-stat-editor"><span class="team-stat-icon">✎</span><div><small>Editores</small><strong id="teamEditorCount">—</strong><span>Diseño y catálogo</span></div></article>
+              <article class="team-stat-card team-stat-total"><span class="team-stat-icon">♙</span><div><small>Equipo activo</small><strong id="teamTotalCount">—</strong><span>Personas autorizadas</span></div></article>
+            </div>
+            <div class="team-toolbar">
+              <div><span class="eyebrow">TU EQUIPO</span><h2>Gestiona los accesos</h2><p>Solo los administradores pueden invitar o cambiar permisos.</p></div>
+              <label class="team-search"><span>⌕</span><input id="teamSearch" type="search" placeholder="Buscar por correo…" aria-label="Buscar integrante"></label>
+              <button id="refreshTeamBtn" class="btn btn-soft">↻ Actualizar</button>
+            </div>
+            <div class="team-grid">
+              <form id="inviteTeamForm" class="panel-card team-invite-card">
+                <div class="team-card-heading"><span class="team-heading-icon">＋</span><div><h2>Agregar integrante</h2><p>Envía una invitación para que configure su contraseña.</p></div></div>
+                <label>Correo electrónico<input id="teamInviteEmail" type="email" required maxlength="254" placeholder="persona@correo.com" autocomplete="off"></label>
+                <label>Tipo de acceso<select id="teamInviteRole"><option value="editor">Editor</option><option value="admin">Administrador</option></select></label>
+                <div class="role-choice-preview" id="roleChoicePreview"><span class="team-role-pill">EDITOR</span><p>Puede editar productos, inventario, imágenes y el diseño de la tienda.</p></div>
+                <div class="role-explainer"><b>Administrador:</b> gestiona usuarios, ajustes, pedidos, productos y diseño.<br><b>Editor:</b> gestiona productos, inventario, imágenes y diseño; no administra usuarios, pedidos ni ajustes generales.</div>
+                <button class="btn btn-primary invite-submit" id="inviteTeamBtn" type="submit"><span>＋</span> Enviar invitación</button>
+                <div id="teamInviteMessage" class="form-message" role="status"></div>
+              </form>
+              <div class="panel-card team-list-card">
+                <div class="team-card-heading"><span class="team-heading-icon team-heading-icon-alt">♙</span><div><h2>Equipo actual</h2><p>Actualiza el rol o retira el acceso cuando sea necesario.</p></div></div>
+                <div id="teamMembersList" class="team-members-list"><div class="empty-list">Cargando usuarios…</div></div>
+                <div id="teamListMessage" class="form-message" role="status"></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="admin-tab" id="tab-designer">
+            <div class="feature-banner designer-feature-banner">
+              <div class="feature-banner-copy">
+                <span class="eyebrow">PERSONALIZACIÓN SIN CÓDIGO</span>
+                <h1>Diseñador de tienda</h1>
+                <p>Cambia la apariencia de tu tienda desde el celular. Ajusta textos, colores, tipografías, imágenes y organiza las secciones sin entrar al código.</p>
+                <div class="feature-pills"><span>✎ Editor visual</span><span>⠿ Ordenar secciones</span><span>◉ Vista previa</span></div>
+              </div>
+              <div class="feature-banner-art designer-banner-art" aria-hidden="true"><span>✦</span><i>◈</i><b>DESIGN</b></div>
+            </div>
+            <div class="designer-benefit-strip"><div><b>01</b><span>Personaliza la identidad</span></div><div><b>02</b><span>Organiza tu página</span></div><div><b>03</b><span>Guarda y publica</span></div></div>
+            <div class="designer-mode-switch" role="tablist" aria-label="Tipo de editor">
+              <button type="button" class="designer-mode active" data-designer-mode="visual">✎ Editor visual</button>
+              <button type="button" class="designer-mode" data-designer-mode="layout">⠿ Arrastrar y ordenar</button>
+            </div>
+            <section id="designerVisualMode" class="designer-mode-panel active">
+              <form id="designerForm" class="designer-grid">
+                <div class="panel-card designer-controls">
+                  <div class="panel-card-head"><div><h2>Identidad y textos</h2><p>Actualiza lo que ven tus clientes.</p></div></div>
+                  <label>Texto pequeño sobre el título<input id="designBadge" maxlength="90"></label>
+                  <label>Título principal<textarea id="designHeroTitle" rows="2" maxlength="120"></textarea></label>
+                  <label>Descripción principal<textarea id="designHeroSubtitle" rows="3" maxlength="300"></textarea></label>
+                  <label>Texto del botón principal<input id="designHeroCta" maxlength="40"></label>
+                  <label>Imagen principal (JPG, PNG o WEBP)<input id="designHeroImage" type="file" accept="image/jpeg,image/png,image/webp"></label>
+                  <div id="designImagePreview" class="designer-image-preview">Imagen principal actual</div>
+                  <div class="designer-color-grid">
+                    <label>Color principal<input id="designAccent" type="color" value="#ff315d"></label>
+                    <label>Fondo<input id="designBackground" type="color" value="#090812"></label>
+                    <label>Tarjetas<input id="designPanel" type="color" value="#151426"></label>
+                    <label>Texto<input id="designText" type="color" value="#f8f7ff"></label>
+                  </div>
+                  <label>Tipografía
+                    <select id="designFont"><option value="Inter">Inter</option><option value="Poppins">Poppins</option><option value="system">Sistema</option><option value="Arial">Arial</option></select>
+                  </label>
+                  <div class="form-actions"><button class="btn btn-primary" type="submit" id="saveDesignBtn">Guardar diseño</button><button class="btn btn-soft" type="button" id="resetDesignBtn">Restaurar valores</button></div>
+                  <div id="designerMessage" class="form-message" role="status"></div>
+                </div>
+                <div class="designer-preview-column">
+                  <div class="panel-card designer-preview-card">
+                    <div class="panel-card-head"><div><h2>Vista previa en vivo</h2><p>Así se verá el encabezado de tu tienda.</p></div><span class="preview-dot" id="designerSaveState">● SIN CAMBIOS</span></div>
+                    <div id="designerLivePreview" class="designer-live-preview">
+                      <div class="preview-brand">♛ <b id="previewBrandName">ZERO Y NANY - SHOP</b></div>
+                      <img id="previewHeroImage" class="preview-hero-image" alt="Vista previa de la portada" hidden>
+                      <span id="previewBadge">TIENDA DIGITAL · ZERO Y NANY - SHOP</span>
+                      <h2 id="previewHeroTitle">Lo que buscas, en un solo lugar.</h2>
+                      <p id="previewHeroSubtitle">Explora el catálogo, revisa la disponibilidad y envía tu pedido de forma sencilla.</p>
+                      <button type="button" id="previewHeroCta">Explorar catálogo ↗</button>
+                    </div>
+                  </div>
+                  <div class="panel-card designer-note"><b>Consejo</b><p>Los cambios se guardan en Supabase y aparecen en la tienda pública. El editor no modifica precios, productos ni pedidos.</p></div>
+                </div>
+              </form>
+            </section>
+            <section id="designerLayoutMode" class="designer-mode-panel" hidden>
+              <div class="panel-card layout-editor-card">
+                <div class="panel-card-head"><div><h2>Orden y visibilidad de secciones</h2><p>Arrastra las secciones para reordenarlas o usa las flechas en el celular.</p></div><button type="button" class="btn btn-primary btn-sm" id="saveLayoutBtn">Guardar distribución</button></div>
+                <div id="designerSectionList" class="designer-section-list">
+                  <div class="designer-section-row" draggable="true" data-section="hero"><span class="drag-grip">⠿</span><b>Portada principal</b><label><input type="checkbox" checked> Visible</label><button type="button" class="btn btn-soft btn-sm" data-move="up">↑</button><button type="button" class="btn btn-soft btn-sm" data-move="down">↓</button></div>
+                  <div class="designer-section-row" draggable="true" data-section="catalogo"><span class="drag-grip">⠿</span><b>Catálogo</b><label><input type="checkbox" checked> Visible</label><button type="button" class="btn btn-soft btn-sm" data-move="up">↑</button><button type="button" class="btn btn-soft btn-sm" data-move="down">↓</button></div>
+                  <div class="designer-section-row" draggable="true" data-section="como-comprar"><span class="drag-grip">⠿</span><b>Cómo comprar</b><label><input type="checkbox" checked> Visible</label><button type="button" class="btn btn-soft btn-sm" data-move="up">↑</button><button type="button" class="btn btn-soft btn-sm" data-move="down">↓</button></div>
+                  <div class="designer-section-row" draggable="true" data-section="contacto"><span class="drag-grip">⠿</span><b>Contacto</b><label><input type="checkbox" checked> Visible</label><button type="button" class="btn btn-soft btn-sm" data-move="up">↑</button><button type="button" class="btn btn-soft btn-sm" data-move="down">↓</button></div>
+                </div>
+                <div class="form-message" id="layoutMessage" role="status"></div>
+              </div>
+            </section>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
+  <div id="adminToast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

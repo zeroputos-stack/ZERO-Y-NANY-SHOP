@@ -1,0 +1,57 @@
+ZERO Y NANY - SHOP CLOUD — INICIO RÁPIDO
+
+ESTE ZIP CONTIENE EL SITIO Y EL SQL. TODAVÍA HAY QUE CONECTAR TU PROYECTO SUPABASE.
+
+1) Supabase: https://supabase.com/
+   - Crea proyecto "zero-shop".
+   - SQL Editor > ejecuta completo: supabase/schema.sql
+
+2) Crear administrador:
+   - Authentication > Users > Add user.
+   - Luego SQL Editor:
+     insert into public.profiles (user_id, role)
+     select id, 'admin' from auth.users
+     where email = 'TU_CORREO';
+
+3) Conectar credenciales:
+   - Project Settings > API.
+   - Copia Project URL y Publishable key.
+   - Pégalas en config.js.
+   - NO pegues service_role ni secret key en el navegador.
+
+4) Probar:
+   - Abre terminal en la carpeta.
+   - Ejecuta: python -m http.server 8000
+   - Navega a http://localhost:8000
+
+5) Publicar:
+   - Sube el proyecto a GitHub.
+   - Importa el repo en https://vercel.com/new
+   - Framework: Other. Build command vacío. Output directory: .
+   - Deploy.
+
+RUTAS:
+- Tienda: /
+- Administración: /admin.html
+
+El pedido se registra y el stock se valida/descuenta en PostgreSQL. El pago es manual por WhatsApp; no hay cobro automático con tarjeta en esta versión.
+
+Al cancelar un pedido desde el panel, el stock reservado se devuelve automáticamente una sola vez.
+
+DISEÑADOR: Si ya ejecutaste el schema anterior, ejecuta también supabase/designer-migration.sql en SQL Editor. Después despliega de nuevo esta carpeta en Vercel.
+
+
+6) EQUIPO (administradores y editores):
+   - Si ya ejecutaste el SQL anterior, ejecuta UNA VEZ: supabase/team-roles-migration.sql
+   - Despliega la Edge Function llamada manage-team con el código de:
+     supabase/functions/manage-team/index.ts
+   - La función usa SUPABASE_SERVICE_ROLE_KEY solo del lado servidor (Edge Function).
+     Nunca la pongas en config.js ni la compartas.
+   - En /admin.html entra como admin > Usuarios y permisos.
+   - Invita por correo y elige Administrador o Editor.
+
+ROLES:
+   Administrador: todo el panel, pedidos, ajustes y gestión de usuarios.
+   Editor: productos, inventario, imágenes y diseñador; sin pedidos, ajustes ni usuarios.
+
+NOTA: las cuentas admin que ya existían se conservan al ejecutar la migración.

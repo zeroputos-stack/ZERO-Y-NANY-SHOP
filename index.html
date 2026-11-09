@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#090812">
+  <meta name="description" content="ZERO Y NANY - SHOP: tienda digital, catálogo y pedidos.">
+  <title>ZERO Y NANY - SHOP | Tienda oficial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="top-glow"></div>
+  <header class="site-header">
+    <div class="container nav">
+      <a class="brand" href="./" aria-label="ZERO-SHOP inicio">
+        <span class="brand-crown">♛</span>
+        <span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#como-comprar">Cómo comprar</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn btn-soft admin-link" href="admin.html">Administrar</a>
+        <button class="btn btn-primary cart-open" id="openCartBtn" type="button">
+          <span>Mi carrito</span><b id="cartCount">0</b>
+        </button>
+      </div>
+      <button class="mobile-menu" id="mobileMenuBtn" aria-label="Abrir menú">☰</button>
+    </div>
+    <div class="mobile-nav" id="mobileNav">
+      <a href="#catalogo">Catálogo</a><a href="#como-comprar">Cómo comprar</a><a href="#contacto">Contacto</a>
+      <a href="admin.html">Panel administrativo</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero container" id="inicio" data-design-section="hero">
+      <div class="hero-copy">
+        <span class="eyebrow" id="heroBadge"><i></i> TIENDA DIGITAL · ZERO Y NANY - SHOP</span>
+        <h1 id="heroTitle">Lo que buscas, en un solo lugar.</h1>
+        <p id="heroSubtitle">Explora el catálogo, revisa la disponibilidad y envía tu pedido de forma sencilla. Tus compras quedan registradas para darles seguimiento.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-large" href="#catalogo"><span id="heroCtaLabel">Explorar catálogo</span> <span>↗</span></a>
+          <a class="btn btn-outline btn-large" id="heroWhatsapp" href="#" target="_blank" rel="noopener">Hablar por WhatsApp</a>
+        </div>
+        <div class="hero-stats">
+          <div><strong id="heroProductCount">—</strong><span>opciones en catálogo</span></div>
+          <div><strong>24/7</strong><span>tienda disponible</span></div>
+          <div><strong>En línea</strong><span>catálogo sincronizado</span></div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img id="heroImage" src="assets/zero-shop-hero.png" alt="Imagen principal de ZERO Y NANY - SHOP" onerror="this.style.display='none'">
+        <div class="hero-art-shade"></div>
+        <div class="hero-art-label"><span>♛ <span data-store-name>ZERO Y NANY - SHOP</span></span><b>Tu próxima compra comienza aquí.</b></div>
+        <div class="hero-floating">✦ Catálogo actualizado</div>
+      </div>
+    </section>
+
+    <section class="container catalog-section" id="catalogo" data-design-section="catalogo">
+      <div class="section-heading">
+        <div><span class="eyebrow">DESCUBRE</span><h2>Catálogo de productos</h2><p>Elige lo que necesitas y agrégalo a tu carrito.</p></div>
+        <div class="live-indicator"><span></span> Actualización en vivo</div>
+      </div>
+      <div class="catalog-controls">
+        <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar en ZERO-SHOP…"></label>
+        <div id="categoryFilters" class="category-filters"></div>
+      </div>
+      <div id="storeStatus" class="status-banner" hidden></div>
+      <div id="productGrid" class="product-grid">
+        <div class="loading-card">Conectando con ZERO-SHOP…</div>
+      </div>
+    </section>
+
+    <section class="container how-section" id="como-comprar" data-design-section="como-comprar">
+      <div class="section-heading"><div><span class="eyebrow">FÁCIL Y DIRECTO</span><h2>¿Cómo comprar?</h2></div></div>
+      <div class="steps-grid">
+        <article><span>01</span><h3>Explora</h3><p>Revisa las opciones, sus detalles y disponibilidad.</p></article>
+        <article><span>02</span><h3>Arma tu pedido</h3><p>Agrega los productos al carrito y completa tus datos.</p></article>
+        <article><span>03</span><h3>Confirma</h3><p>Recibirás un folio para dar seguimiento por WhatsApp.</p></article>
+      </div>
+      <p class="notice">La tienda registra pedidos; el pago se coordina con ZERO-SHOP por el canal de atención indicado. No se realiza un cobro automático en esta versión.</p>
+    </section>
+
+    <section class="container contact-section" id="contacto" data-design-section="contacto">
+      <div><span class="eyebrow">¿NECESITAS AYUDA?</span><h2>Estamos para atenderte.</h2><p>Si tienes dudas sobre un producto o tu pedido, ponte en contacto con la tienda.</p></div>
+      <a id="contactWhatsapp" class="btn btn-primary btn-large" href="#" target="_blank" rel="noopener">Contactar por WhatsApp ↗</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner"><a class="brand" href="./"><span class="brand-crown">♛</span><span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span></a><span>© <span id="year"></span> <span data-store-name>ZERO Y NANY - SHOP</span>. Catálogo digital.</span><a href="admin.html">Acceso administrativo</a></div>
+  </footer>
+
+  <button class="cart-backdrop" id="cartBackdrop" aria-label="Cerrar carrito"></button>
+  <aside class="cart-drawer" id="cartDrawer" aria-label="Carrito de compras">
+    <div class="drawer-head"><div><span class="eyebrow">TU COMPRA</span><h2>Mi carrito</h2></div><button id="closeCartBtn" class="icon-btn" aria-label="Cerrar">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-summary"><span>Total estimado</span><strong id="cartTotal">$0.00</strong></div>
+    <form id="checkoutForm" class="checkout-form">
+      <h3>Datos para tu pedido</h3>
+      <label>Nombre<input id="customerName" required minlength="2" maxlength="100" placeholder="Tu nombre"></label>
+      <label>WhatsApp<input id="customerWhatsapp" required inputmode="tel" minlength="8" maxlength="20" placeholder="Número con lada"></label>
+      <label>Notas (opcional)<textarea id="customerNotes" maxlength="500" rows="2" placeholder="Detalles de tu pedido"></textarea></label>
+      <button class="btn btn-primary btn-block" id="placeOrderBtn" type="submit">Enviar pedido</button>
+      <small>El inventario se valida al confirmar el pedido.</small>
+    </form>
+    <div id="checkoutResult" class="checkout-result" hidden></div>
+  </aside>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/store.js"></script>
+</body>
+</html>
