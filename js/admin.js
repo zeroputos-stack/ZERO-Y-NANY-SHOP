@@ -270,7 +270,7 @@
   }
   async function callTeamFunction(payload){
     // Esta tienda usa la Edge Function publicada en Supabase como "dynamic-service".
-    const {data,error}=await supabase.functions.invoke("dynamic-service",{body:payload});
+    const {data,error}=await supabase.functions.invoke("manage-service",{body:payload});
     if(error){
       let detail=error.message||"No se pudo completar la operación.";
       try{const context=error.context;if(context&&typeof context.json==="function"){const body=await context.json();if(body?.error)detail=body.error;}}catch{}
@@ -280,25 +280,28 @@
     return data;
   }
   async function loadTeamMembers(){
-    if(currentUserRole!=="admin")return;
-    const list=$("teamMembersList");if(list)list.innerHTML='<div class="empty-list">Cargando usuarios…</div>';
-    try{
-      const data=await callTeamFunction({action:"list"});
-      // dynamic-service devuelve { users: [{ id, email, role, confirmed }] }.
-      teamMembers=(data.users||[])
-        .filter(user=>["admin","editor"].includes(user.role))
-        .map(user=>({
-          user_id:user.id,
-          email:user.email||"Correo no disponible",
-          role:user.role,
-          confirmed:!!user.confirmed,
-          is_current_user:user.id===currentUserId
-        }));
-      renderTeamMembers();
-    }catch(err){
-      if(list)list.innerHTML=`<div class="empty-list">${safe(err.message)}. Comprueba que la función dynamic-service esté publicada.</div>`;
-    }
+  if(currentUserRole!=="admin")return;
+
+  const list=$("teamMembersList");
+  if(list)list.innerHTML='<div class="empty-list">Cargando usuarios…</div>';
+
+  try{
+    const data=await callTeamFunction({action:"list"});
+
+    teamMembers=(data.members||[]).map(user=>({
+      user_id:user.user_id,
+      email:user.email||"Correo no disponible",
+      role:user.role,
+      created_at:user.created_at,
+      is_current_user:user.is_current_user===true || user.user_id===currentUserId
+    }));
+
+    renderTeamMembers();
+
+  }catch(err){
+    if(list)list.innerHTML=`<div class="empty-list">${safe(err.message)}. Comprueba que manage-team esté publicada.</div>`;
   }
+}
   function renderTeamMembers(){
     const list=$("teamMembersList");if(!list)return;
     const admins=teamMembers.filter(member=>member.role==="admin").length;
@@ -329,13 +332,13 @@
   }
   async function updateTeamRole(userId){
     const select=document.querySelector(`[data-team-role="${CSS.escape(userId)}"]`);if(!select)return;
-    try{const result=await callTeamFunction({action:"set-role",user_id:userId,role:select.value});message("teamListMessage",result.message||"Permisos actualizados.",true);await loadTeamMembers();}
+    try{const result=await callTeamFunction({action:"update-role",user_id:userId,role:select.value});message("teamListMessage",result.message||"Permisos actualizados.",true);await loadTeamMembers();}
     catch(err){message("teamListMessage",err.message);}
   }
   async function removeTeamMember(userId){
     const member=teamMembers.find(x=>x.user_id===userId);if(!member)return;
     if(!confirm(`¿Retirar el acceso de administrador/editor de ${member.email}? Su cuenta seguirá existiendo, pero dejará de tener acceso al panel del equipo.`))return;
-    try{const result=await callTeamFunction({action:"revoke",user_id:userId});message("teamListMessage",result.message||"Permisos retirados.",true);await loadTeamMembers();}
+    try{const result=await callTeamFunction({action:"remove",user_id:userId});message("teamListMessage",result.message||"Permisos retirados.",true);await loadTeamMembers();}
     catch(err){message("teamListMessage",err.message);}
   }
   function startRealtime(){
