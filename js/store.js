@@ -108,28 +108,17 @@
   const p = products.find(x => x.id === id);
   if (!p) return;
 
-  const existing = cart.find(x => x.product_id === id);
-  const next = (existing?.quantity || 0) + 1;
+  const existing = cart.find(x => function saveCart() {
+  localStorage.setItem("zeroShopCloudCart", JSON.stringify(cart));
+  renderCart();
+}
 
-  if (p.stock !== null && next > Number(p.stock)) {
-    toast("No hay más existencias disponibles.");
-    return;
-  }
+function addToCart(id) {
+  // Código nuevo
+}
 
-  if (existing) {
-    existing.quantity = next;
-  } else {
-    cart.push({
-      product_id: id,
-      quantity: 1
-    });
-  }
-
-  $("checkoutForm").hidden = false;
-  $("checkoutResult").hidden = true;
-
-  saveCart();
-  toast("Producto agregado al carrito.");
+function renderCart() {
+  // Código que ya tenías
 }
     const p=products.find(x=>x.id===id); if(!p)return;
     const existing=cart.find(x=>x.product_id===id);
