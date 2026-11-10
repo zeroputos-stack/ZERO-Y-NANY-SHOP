@@ -105,6 +105,32 @@
 
   function saveCart(){localStorage.setItem("zeroShopCloudCart",JSON.stringify(cart));renderCart();}
   function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+
+  const existing = cart.find(x => x.product_id === id);
+  const next = (existing?.quantity || 0) + 1;
+
+  if (p.stock !== null && next > Number(p.stock)) {
+    toast("No hay más existencias disponibles.");
+    return;
+  }
+
+  if (existing) {
+    existing.quantity = next;
+  } else {
+    cart.push({
+      product_id: id,
+      quantity: 1
+    });
+  }
+
+  $("checkoutForm").hidden = false;
+  $("checkoutResult").hidden = true;
+
+  saveCart();
+  toast("Producto agregado al carrito.");
+}
     const p=products.find(x=>x.id===id); if(!p)return;
     const existing=cart.find(x=>x.product_id===id);
     const next=(existing?.quantity||0)+1;
