@@ -8,114 +8,137 @@
   let activeAdminId = null;
   let busy = false;
 
+  const DEFAULT_INSTRUCTIONS =
+    "Confirma el método de pago por WhatsApp antes de realizar tu pago.";
+
+  const DEFAULT_SECURITY_NOTICE =
+    "Verifica que los datos correspondan a ZERO Y NANY - SHOP antes de transferir.";
+
   const STYLE = `
     .payment-delivery-card {
-      margin-top: 18px;
-      display: grid;
-      gap: 18px;
+      margin-top:18px;
+      display:grid;
+      gap:18px;
     }
 
     .payment-delivery-card h2 {
-      margin: 0;
-      font-size: 19px;
+      margin:0;
+      font-size:19px;
     }
 
     .payment-delivery-card h3 {
-      margin: 0 0 10px;
-      font-size: 14px;
+      margin:0 0 10px;
+      font-size:14px;
     }
 
     .payment-delivery-card .settings-intro {
-      margin: 5px 0 0;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.55;
+      margin:5px 0 0;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.55;
     }
 
     .pd-group {
-      padding: 16px;
-      border: 1px solid var(--line);
-      border-radius: 16px;
-      background: #ffffff05;
-      display: grid;
-      gap: 12px;
+      padding:16px;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#ffffff05;
+      display:grid;
+      gap:12px;
     }
 
     .pd-toggle-grid {
-      display: grid;
-      grid-template-columns: repeat(2,minmax(0,1fr));
-      gap: 10px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
     }
 
     .pd-toggle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #ffffff06;
-      font-size: 12px;
-      font-weight: 700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#ffffff06;
+      font-size:12px;
+      font-weight:700;
     }
 
     .pd-toggle input {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--red);
-      flex: 0 0 auto;
+      width:18px;
+      height:18px;
+      accent-color:var(--red);
+      flex:0 0 auto;
     }
 
     .pd-fields {
-      display: grid;
-      grid-template-columns: repeat(2,minmax(0,1fr));
-      gap: 12px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:12px;
     }
 
-    .pd-fields label,
-    .pd-group > label {
-      display: grid;
-      gap: 6px;
-      font-size: 11px;
-      font-weight: 700;
+    .pd-fields label {
+      display:grid;
+      gap:6px;
+      font-size:11px;
+      font-weight:700;
     }
 
     .pd-fields input,
     .pd-fields select,
-    .pd-group textarea {
-      width: 100%;
-      min-width: 0;
+    .pd-fields textarea {
+      width:100%;
+      min-width:0;
+      box-sizing:border-box;
     }
 
     .pd-span-2 {
-      grid-column: 1/-1;
+      grid-column:1/-1;
     }
 
     .pd-help {
-      margin: 0;
-      color: var(--muted);
-      font-size: 10px;
-      line-height: 1.5;
+      margin:0;
+      color:var(--muted);
+      font-size:10px;
+      line-height:1.5;
     }
 
     .pd-save-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
     }
 
     @media(max-width:650px) {
       .pd-toggle-grid,
       .pd-fields {
-        grid-template-columns: 1fr;
+        grid-template-columns:1fr;
       }
 
       .pd-span-2 {
-        grid-column: auto;
+        grid-column:auto;
       }
     }
   `;
+
+  function syncPaymentFields() {
+    const main = $("pdPaymentInstructions");
+    const legacy = $("settingPayment");
+
+    if (!main || !legacy || main.dataset.syncBound) return;
+
+    main.addEventListener("input", () => {
+      legacy.value = main.value;
+    });
+
+    legacy.addEventListener("input", () => {
+      main.value = legacy.value;
+    });
+
+    main.dataset.syncBound = "true";
+  }
 
   function injectPanel() {
     const tab = $("tab-settings");
@@ -133,7 +156,8 @@
     const card = document.createElement("section");
 
     card.id = "paymentDeliveryCard";
-    card.className = "panel-card settings-form payment-delivery-card";
+    card.className =
+      "panel-card settings-form payment-delivery-card";
     card.hidden = true;
 
     card.innerHTML = `
@@ -141,19 +165,19 @@
         <span class="eyebrow">CONFIGURACIÓN DE COMPRA</span>
         <h2>Pagos, recepción y entrega</h2>
         <p class="settings-intro">
-          Controla qué opciones aparecen al cliente al finalizar
-          su compra y define el plazo estimado de entrega.
+          Personaliza las opciones de pago, los mensajes que aparecen
+          al cliente y el tiempo de entrega.
         </p>
       </div>
 
       <form id="paymentDeliveryForm">
 
         <section class="pd-group">
+
           <div>
             <h3>01 · Métodos de pago</h3>
             <p class="pd-help">
-              El cliente solamente podrá seleccionar
-              los métodos que mantengas habilitados.
+              Activa o desactiva los métodos disponibles.
             </p>
           </div>
 
@@ -169,52 +193,87 @@
             </label>
           </div>
 
-          <div class="pd-fields" id="pdBankFields">
+          <div class="pd-fields">
+
             <label>
               Banco
-              <input id="pdBankName"
-                maxlength="100"
+              <input id="pdBankName" maxlength="100"
                 placeholder="Nombre del banco">
             </label>
 
             <label>
               Titular de la cuenta
-              <input id="pdAccountHolder"
-                maxlength="120"
+              <input id="pdAccountHolder" maxlength="120"
                 placeholder="Nombre del titular">
             </label>
 
             <label>
               Número de cuenta
-              <input id="pdAccountNumber"
-                maxlength="40"
+              <input id="pdAccountNumber" maxlength="40"
                 placeholder="Número de cuenta">
             </label>
 
             <label>
               CLABE interbancaria
-              <input id="pdClabe"
-                maxlength="30"
-                inputmode="numeric"
-                placeholder="CLABE (si aplica)">
+              <input id="pdClabe" maxlength="30"
+                inputmode="numeric" placeholder="CLABE">
             </label>
+
           </div>
 
-          <p class="pd-help">
-            Las instrucciones generales de pago se siguen editando
-            en el apartado superior de esta misma página.
-          </p>
         </section>
 
+
         <section class="pd-group">
+
           <div>
-            <h3>02 · Forma de recibir los productos</h3>
+            <h3>02 · Mensajes de pago para el cliente</h3>
             <p class="pd-help">
-              Puedes ofrecer una o ambas modalidades de entrega.
+              Estos mensajes aparecerán debajo de las opciones
+              de pago en la pantalla Finalizar compra.
+            </p>
+          </div>
+
+          <div class="pd-fields">
+
+            <label class="pd-span-2">
+              Texto principal debajo de opciones de pago
+
+              <textarea
+                id="pdPaymentInstructions"
+                rows="3"
+                maxlength="1000"
+                placeholder="Escribe las instrucciones que verá el cliente..."
+              ></textarea>
+            </label>
+
+            <label class="pd-span-2">
+              Aviso de seguridad (texto pequeño)
+
+              <textarea
+                id="pdPaymentSecurityNotice"
+                rows="2"
+                maxlength="500"
+                placeholder="Escribe el aviso de seguridad..."
+              ></textarea>
+            </label>
+
+          </div>
+
+        </section>
+
+
+        <section class="pd-group">
+
+          <div>
+            <h3>03 · Forma de recibir los productos</h3>
+            <p class="pd-help">
+              Puedes ofrecer una o ambas modalidades.
             </p>
           </div>
 
           <div class="pd-toggle-grid">
+
             <label class="pd-toggle">
               <input id="pdDeliveryWhatsappEnabled" type="checkbox">
               Entrega mediante WhatsApp
@@ -224,37 +283,33 @@
               <input id="pdDeliveryAccountEnabled" type="checkbox">
               Entrega en la cuenta de la página
             </label>
+
           </div>
+
         </section>
 
+
         <section class="pd-group">
+
           <div>
-            <h3>03 · Tiempo estimado de entrega</h3>
+            <h3>04 · Tiempo estimado de entrega</h3>
             <p class="pd-help">
-              Este plazo se mostrará en el proceso de compra
-              y en la confirmación del pedido.
+              Este plazo aparecerá durante la compra.
             </p>
           </div>
 
           <div class="pd-fields">
+
             <label>
               Tiempo mínimo
-              <input id="pdEtaMin"
-                type="number"
-                min="0"
-                max="9999"
-                step="1"
-                required>
+              <input id="pdEtaMin" type="number"
+                min="0" max="9999" step="1" required>
             </label>
 
             <label>
               Tiempo máximo
-              <input id="pdEtaMax"
-                type="number"
-                min="0"
-                max="9999"
-                step="1"
-                required>
+              <input id="pdEtaMax" type="number"
+                min="0" max="9999" step="1" required>
             </label>
 
             <label>
@@ -268,21 +323,27 @@
 
             <label class="pd-span-2">
               Condición o momento de inicio
+
               <textarea
                 id="pdEtaCondition"
                 rows="2"
                 maxlength="180"
-                placeholder="Ej. después de confirmar el pago y la disponibilidad del producto">
-              </textarea>
+                placeholder="Después de confirmar el pago..."
+              ></textarea>
             </label>
+
           </div>
+
         </section>
 
+
         <div class="pd-save-row">
+
           <button
             class="btn btn-primary"
             id="pdSaveBtn"
-            type="submit">
+            type="submit"
+          >
             Guardar pagos y entrega
           </button>
 
@@ -290,26 +351,31 @@
             id="pdMessage"
             class="form-message"
             role="status"
-            aria-live="polite">
-          </span>
+            aria-live="polite"
+          ></span>
+
         </div>
 
       </form>
     `;
 
     baseForm.insertAdjacentElement("afterend", card);
+
+    syncPaymentFields();
   }
+
 
   function setMessage(text, ok = false) {
     const element = $("pdMessage");
-
     if (!element) return;
 
     element.textContent = text;
     element.className = "form-message" + (ok ? " ok" : "");
   }
 
+
   function fillForm(data = {}) {
+
     $("pdTransferEnabled").checked =
       data.payment_transfer_enabled !== false;
 
@@ -328,6 +394,18 @@
     $("pdClabe").value =
       data.payment_clabe || "";
 
+    $("pdPaymentInstructions").value =
+      data.payment_instructions || DEFAULT_INSTRUCTIONS;
+
+    $("pdPaymentSecurityNotice").value =
+      data.payment_security_notice ?? DEFAULT_SECURITY_NOTICE;
+
+    // Mantiene sincronizado el campo anterior de Ajustes.
+    if ($("settingPayment")) {
+      $("settingPayment").value =
+        $("pdPaymentInstructions").value;
+    }
+
     $("pdDeliveryWhatsappEnabled").checked =
       data.delivery_whatsapp_enabled !== false;
 
@@ -336,23 +414,21 @@
 
     $("pdEtaMin").value =
       Number.isInteger(Number(data.delivery_eta_min))
-        ? Number(data.delivery_eta_min)
-        : 5;
+        ? Number(data.delivery_eta_min) : 5;
 
     $("pdEtaMax").value =
       Number.isInteger(Number(data.delivery_eta_max))
-        ? Number(data.delivery_eta_max)
-        : 15;
+        ? Number(data.delivery_eta_max) : 15;
 
     $("pdEtaUnit").value =
       ["minutes", "hours", "days"].includes(data.delivery_eta_unit)
-        ? data.delivery_eta_unit
-        : "minutes";
+        ? data.delivery_eta_unit : "minutes";
 
     $("pdEtaCondition").value =
       data.delivery_eta_condition ||
       "después de confirmar el pago y la disponibilidad del producto";
   }
+
 
   async function getAdminUser(session) {
     const user = session?.user;
@@ -365,12 +441,11 @@
       .eq("user_id", user.id)
       .maybeSingle();
 
-    if (error || data?.role !== "admin") {
-      return null;
-    }
+    if (error || data?.role !== "admin") return null;
 
     return user;
   }
+
 
   async function loadSettings(session) {
     const card = $("paymentDeliveryCard");
@@ -399,6 +474,8 @@
         payment_account_holder,
         payment_account_number,
         payment_clabe,
+        payment_instructions,
+        payment_security_notice,
         delivery_whatsapp_enabled,
         delivery_account_enabled,
         delivery_eta_min,
@@ -418,6 +495,7 @@
     setMessage("Configuración cargada.", true);
   }
 
+
   async function saveSettings(event) {
     event.preventDefault();
 
@@ -433,7 +511,7 @@
       max < min
     ) {
       setMessage(
-        "Revisa el tiempo: ambos valores deben ser enteros y el máximo no puede ser menor que el mínimo."
+        "Revisa el tiempo: el máximo no puede ser menor que el mínimo."
       );
       return;
     }
@@ -446,9 +524,7 @@
       !sessionData?.session?.user ||
       sessionData.session.user.id !== activeAdminId
     ) {
-      setMessage(
-        "Tu sesión de administrador no está activa. Vuelve a iniciar sesión."
-      );
+      setMessage("Tu sesión de administrador no está activa.");
       return;
     }
 
@@ -460,24 +536,20 @@
       return;
     }
 
+    const instructions = $("pdPaymentInstructions").value.trim();
+
     const update = {
-      payment_transfer_enabled:
-        $("pdTransferEnabled").checked,
+      payment_transfer_enabled: $("pdTransferEnabled").checked,
+      payment_whatsapp_enabled: $("pdWhatsappPaymentEnabled").checked,
 
-      payment_whatsapp_enabled:
-        $("pdWhatsappPaymentEnabled").checked,
+      payment_bank_name: $("pdBankName").value.trim(),
+      payment_account_holder: $("pdAccountHolder").value.trim(),
+      payment_account_number: $("pdAccountNumber").value.trim(),
+      payment_clabe: $("pdClabe").value.trim(),
 
-      payment_bank_name:
-        $("pdBankName").value.trim(),
-
-      payment_account_holder:
-        $("pdAccountHolder").value.trim(),
-
-      payment_account_number:
-        $("pdAccountNumber").value.trim(),
-
-      payment_clabe:
-        $("pdClabe").value.trim(),
+      payment_instructions: instructions,
+      payment_security_notice:
+        $("pdPaymentSecurityNotice").value.trim(),
 
       delivery_whatsapp_enabled:
         $("pdDeliveryWhatsappEnabled").checked,
@@ -487,12 +559,8 @@
 
       delivery_eta_min: min,
       delivery_eta_max: max,
-
-      delivery_eta_unit:
-        $("pdEtaUnit").value,
-
-      delivery_eta_condition:
-        $("pdEtaCondition").value.trim()
+      delivery_eta_unit: $("pdEtaUnit").value,
+      delivery_eta_condition: $("pdEtaCondition").value.trim()
     };
 
     busy = true;
@@ -503,6 +571,7 @@
     setMessage("Guardando cambios…");
 
     try {
+
       const { error } = await supabase
         .from("store_settings")
         .update(update)
@@ -510,24 +579,34 @@
 
       if (error) throw error;
 
+      // Sincronizar el campo de instrucciones anterior.
+      if ($("settingPayment")) {
+        $("settingPayment").value = instructions;
+      }
+
       setMessage(
-        "Pagos, recepción y tiempo de entrega actualizados correctamente.",
+        "¡Configuración guardada! Los mensajes de pago y entrega fueron actualizados.",
         true
       );
 
     } catch (error) {
+
       setMessage(
         "No se pudieron guardar los cambios: " +
-        (error.message || "error desconocido")
+        (error.message || "Error desconocido")
       );
 
     } finally {
+
       busy = false;
       button.disabled = false;
+
     }
   }
 
+
   function init() {
+
     injectPanel();
 
     if (!supabase || !$("paymentDeliveryForm")) return;
@@ -546,13 +625,19 @@
     });
 
     supabase.auth.onAuthStateChange((event, session) => {
+
       window.setTimeout(() => {
+
         loadSettings(session).catch(err =>
           setMessage(err.message || "No se pudo cargar la configuración.")
         );
+
       }, 0);
+
     });
+
   }
 
   init();
+
 })();
