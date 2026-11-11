@@ -1,3 +1,697 @@
-<a class="btn btn-soft account-link" href="account.html">Mi cuenta</a>
 
-<a href="account.html">Mi cuenta / Registrarme</a>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#100b1c">
+<title>Mi cuenta | ZERO-SHOP</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Inter,Arial,sans-serif;
+ color:#fff;
+ background:
+ radial-gradient(ellipse at 15% 10%,#47133f 0,transparent 40%),
+ radial-gradient(ellipse at 90% 85%,#25145b 0,transparent 40%),
+ #0b0912;
+ min-height:100vh;
+}
+button,input{font:inherit}
+a{color:inherit}
+.top{
+ display:flex;justify-content:space-between;align-items:center;
+ padding:20px 6%;border-bottom:1px solid #ffffff18;
+}
+.brand{font-size:22px;font-weight:900;letter-spacing:-1px}
+.brand span{color:#fa3980}
+.top a{color:#d9c8e9;text-decoration:none;font-size:14px}
+.container{width:min(1050px,92%);margin:45px auto}
+.layout{
+ display:grid;grid-template-columns:0.9fr 1.1fr;
+ border:1px solid #ffffff20;border-radius:25px;
+ overflow:hidden;background:#171120eF;
+ box-shadow:0 25px 80px #0008;
+}
+.intro{
+ padding:45px 35px;
+ background:linear-gradient(145deg,#791b68,#35165f 65%,#17102b);
+ display:flex;flex-direction:column;justify-content:center;
+}
+.logo{font-size:38px;margin-bottom:20px}
+.intro h1{font-size:39px;line-height:1.12;margin:0 0 18px}
+.intro p{color:#ead9ed;line-height:1.8}
+.features{margin-top:25px;line-height:2.3;color:#fff}
+.form-area{padding:38px 32px;min-width:0}
+.form-area h2{font-size:29px;margin:0 0 8px}
+.sub{color:#b8aabd;font-size:14px;margin-bottom:25px}
+.tabs{display:flex;gap:8px;background:#0e0b15;padding:5px;border-radius:12px;margin-bottom:24px}
+.tabs button{
+ flex:1;border:0;padding:12px 5px;border-radius:9px;
+ background:transparent;color:#c6b7d1;cursor:pointer;font-weight:700;
+}
+.tabs button.active{background:linear-gradient(90deg,#f52c70,#a82cba);color:white}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:13px;font-weight:700;margin-bottom:8px;color:#e9ddec}
+.field input{
+ width:100%;padding:14px 15px;border-radius:11px;
+ border:1px solid #ffffff25;background:#0d0a14;color:#fff;
+ outline:none;
+}
+.field input:focus{border-color:#ed3a91;box-shadow:0 0 0 3px #ed3a9120}
+.primary{
+ width:100%;padding:15px;border:0;border-radius:12px;
+ background:linear-gradient(100deg,#fa316c,#b02bba);
+ color:white;font-weight:800;cursor:pointer;
+ box-shadow:0 8px 25px #dc267a35;
+}
+.primary:disabled{opacity:.55;cursor:wait}
+.secondary{
+ border:1px solid #ffffff30;background:#ffffff09;color:#fff;
+ border-radius:10px;padding:11px 15px;cursor:pointer;
+}
+.links{display:flex;justify-content:space-between;gap:12px;margin-top:18px;flex-wrap:wrap}
+.links button{background:none;border:0;color:#f78dc3;cursor:pointer}
+.message{
+ padding:13px;border-radius:10px;margin:0 0 18px;
+ font-size:13px;line-height:1.5;
+ background:#ffffff10;border:1px solid #ffffff20;
+}
+.message.error{background:#ff35421a;border-color:#ff596c66;color:#ffb5bb}
+.message.success{background:#25b97918;border-color:#25b97966;color:#a8f4d1}
+[hidden]{display:none!important}
+.dashboard{
+ border:1px solid #ffffff20;border-radius:22px;
+ background:#171120;padding:30px;
+}
+.dash-head{display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}
+.dash-head h2{margin:0}
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-title{margin:30px 0 16px;font-size:19px}
+.order{
+ border:1px solid #ffffff20;background:#ffffff08;
+ border-radius:13px;padding:16px;margin-bottom:12px;
+}
+.order-top{display:flex;justify-content:space-between;gap:10px}
+.order small{color:#bbaac6}
+.pill{font-size:11px;border-radius:20px;padding:5px 9px;background:#713a7d}
+.order strong{color:#ff8bbd}
+.empty{color:#b9a9c4;padding:20px;border:1px dashed #ffffff30;border-radius:12px}
+.footer{text-align:center;color:#887b91;padding:25px;font-size:12px}
+@media(max-width:750px){
+ .container{margin:25px auto}
+ .layout{grid-template-columns:1fr}
+ .intro{padding:28px 25px}
+ .intro h1{font-size:29px}
+ .features{display:none}
+ .form-area{padding:28px 22px}
+ .profile-grid{grid-template-columns:1fr}
+ .dashboard{padding:20px}
+ .top{padding:17px 5%}
+}
+</style>
+</head>
+
+<body>
+
+<header class="top">
+ <div class="brand">♛ ZERO <span>SHOP</span></div>
+ <a href="index.html">← Volver a la tienda</a>
+</header>
+
+<main class="container">
+
+<section class="layout" id="authCard">
+
+ <div class="intro">
+  <div class="logo">♛</div>
+  <h1>Tu cuenta.<br>Tu espacio.</h1>
+  <p>Regístrate en ZERO-SHOP y disfruta de una experiencia de compra más sencilla y personalizada.</p>
+  <div class="features">
+   ✓ Acceso personalizado<br>
+   ✓ Seguimiento de pedidos<br>
+   ✓ Información de tu cuenta<br>
+   ✓ Atención al cliente
+  </div>
+ </div>
+
+ <div class="form-area">
+
+  <h2 id="formTitle">Bienvenido</h2>
+  <p class="sub" id="formSubtitle">Ingresa a tu cuenta ZERO-SHOP.</p>
+
+  <div id="message" class="message" hidden></div>
+
+  <div class="tabs" id="tabs">
+   <button type="button" class="active" data-mode="login">Ingresar</button>
+   <button type="button" data-mode="register">Registrarme</button>
+  </div>
+
+  <!-- INICIAR SESIÓN -->
+  <form id="loginForm">
+   <div class="field">
+    <label>Correo electrónico</label>
+    <input type="email" id="loginEmail" required autocomplete="email" placeholder="correo@ejemplo.com">
+   </div>
+
+   <div class="field">
+    <label>Contraseña</label>
+    <input type="password" id="loginPassword" required autocomplete="current-password" placeholder="Tu contraseña">
+   </div>
+
+   <button class="primary" type="submit">Iniciar sesión →</button>
+
+   <div class="links">
+    <button type="button" id="forgotBtn">¿Olvidaste tu contraseña?</button>
+    <button type="button" data-mode="register">Crear cuenta</button>
+   </div>
+  </form>
+
+  <!-- REGISTRO -->
+  <form id="registerForm" hidden>
+
+   <div class="field">
+    <label>Nombre de usuario *</label>
+    <input id="regUsername" required minlength="3" maxlength="40" autocomplete="username" placeholder="Ejemplo: zero123">
+   </div>
+
+   <div class="field">
+    <label>Nombre completo</label>
+    <input id="regFullName" maxlength="100" autocomplete="name" placeholder="Tu nombre">
+   </div>
+
+   <div class="field">
+    <label>Correo electrónico *</label>
+    <input type="email" id="regEmail" required autocomplete="email" placeholder="correo@ejemplo.com">
+   </div>
+
+   <div class="field">
+    <label>Teléfono (opcional)</label>
+    <input type="tel" id="regPhone" maxlength="25" autocomplete="tel" placeholder="Tu número de contacto">
+   </div>
+
+   <div class="field">
+    <label>Contraseña *</label>
+    <input type="password" id="regPassword" required minlength="8" autocomplete="new-password" placeholder="Mínimo 8 caracteres">
+   </div>
+
+   <div class="field">
+    <label>Confirmar contraseña *</label>
+    <input type="password" id="regConfirm" required minlength="8" autocomplete="new-password" placeholder="Repite tu contraseña">
+   </div>
+
+   <button class="primary" type="submit">Crear mi cuenta →</button>
+
+   <div class="links">
+    <button type="button" data-mode="login">Ya tengo una cuenta</button>
+   </div>
+
+  </form>
+
+  <!-- RECUPERAR CONTRASEÑA -->
+  <form id="recoverForm" hidden>
+   <div class="field">
+    <label>Correo electrónico de tu cuenta</label>
+    <input type="email" id="recoverEmail" required autocomplete="email" placeholder="correo@ejemplo.com">
+   </div>
+
+   <button class="primary" type="submit">Enviar enlace de recuperación</button>
+
+   <div class="links">
+    <button type="button" data-mode="login">Volver al inicio de sesión</button>
+   </div>
+  </form>
+
+  <!-- CAMBIAR CONTRASEÑA -->
+  <form id="resetForm" hidden>
+   <div class="field">
+    <label>Nueva contraseña</label>
+    <input type="password" id="newPassword" required minlength="8" autocomplete="new-password">
+   </div>
+
+   <div class="field">
+    <label>Confirmar nueva contraseña</label>
+    <input type="password" id="newPasswordConfirm" required minlength="8" autocomplete="new-password">
+   </div>
+
+   <button class="primary" type="submit">Guardar nueva contraseña</button>
+  </form>
+
+ </div>
+</section>
+
+<!-- PANEL DEL CLIENTE -->
+<section class="dashboard" id="dashboard" hidden>
+
+ <div class="dash-head">
+  <div>
+   <span style="color:#f17eb8;font-size:12px;font-weight:bold">MI ESPACIO ZERO-SHOP</span>
+   <h2 id="welcome">Hola</h2>
+   <p class="sub" id="accountEmail"></p>
+  </div>
+  <button class="secondary" id="logoutBtn">Cerrar sesión</button>
+ </div>
+
+ <a href="admin.html" id="adminLink" hidden style="color:#ff8ac2">Ir al panel administrativo →</a>
+
+ <h3 class="section-title">Mi perfil</h3>
+
+ <form id="profileForm">
+  <div class="profile-grid">
+   <div class="field">
+    <label>Nombre de usuario</label>
+    <input id="profileUsername" required minlength="3" maxlength="40">
+   </div>
+   <div class="field">
+    <label>Nombre completo</label>
+    <input id="profileFullName" maxlength="100">
+   </div>
+  </div>
+  <button class="primary" type="submit">Guardar cambios</button>
+ </form>
+
+ <h3 class="section-title">Mis pedidos</h3>
+ <div id="ordersList">
+  <div class="empty">Cargando pedidos...</div>
+ </div>
+
+</section>
+
+</main>
+
+<footer class="footer">
+ ZERO Y NANY - SHOP · Tu tienda digital
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="js/supabase-client.js"></script>
+
+<script>
+(() => {
+"use strict";
+
+const db = window.zeroSupabase;
+const $ = id => document.getElementById(id);
+
+const authCard = $("authCard");
+const dashboard = $("dashboard");
+const message = $("message");
+const tabs = $("tabs");
+
+let currentUser = null;
+
+function notify(text,type="success"){
+ message.textContent = text;
+ message.className = "message " + type;
+ message.hidden = false;
+}
+
+function clearMessage(){
+ message.hidden = true;
+}
+
+function mode(name){
+ clearMessage();
+ $("formTitle").textContent =
+  name === "register" ? "Crear cuenta" :
+  name === "recover" ? "Recuperar acceso" :
+  name === "reset" ? "Nueva contraseña" : "Bienvenido";
+
+ $("formSubtitle").textContent =
+  name === "register" ? "Únete a ZERO-SHOP." :
+  name === "recover" ? "Te enviaremos un enlace a tu correo." :
+  name === "reset" ? "Establece una nueva contraseña." :
+  "Ingresa a tu cuenta ZERO-SHOP.";
+
+ ["login","register","recover","reset"].forEach(n=>{
+  $(n+"Form").hidden = n !== name;
+ });
+
+ tabs.hidden = !["login","register"].includes(name);
+
+ document.querySelectorAll("[data-mode]").forEach(btn=>{
+  btn.classList.toggle("active",btn.dataset.mode===name);
+ });
+}
+
+function busy(form,active){
+ const button = form.querySelector('button[type="submit"]');
+ if(button){
+  button.disabled = active;
+  button.textContent = active ? "Procesando..." : button.dataset.original;
+ }
+}
+
+document.querySelectorAll('form button[type="submit"]').forEach(btn=>{
+ btn.dataset.original = btn.textContent;
+});
+
+function showError(error){
+ console.error(error);
+ let msg = error?.message || "Ocurrió un error. Intenta nuevamente.";
+
+ if(/invalid login credentials/i.test(msg))
+  msg = "Correo o contraseña incorrectos.";
+
+ if(/email not confirmed/i.test(msg))
+  msg = "Debes confirmar tu correo electrónico antes de ingresar.";
+
+ if(/user already registered/i.test(msg))
+  msg = "Este correo ya tiene una cuenta. Intenta iniciar sesión.";
+
+ notify(msg,"error");
+}
+
+function money(value){
+ return new Intl.NumberFormat("es-MX",{
+  style:"currency",currency:"MXN"
+ }).format(Number(value)||0);
+}
+
+function escapeHTML(value){
+ return String(value ?? "").replace(/[&<>"']/g,c=>({
+  "&":"&amp;","<":"&lt;",">":"&gt;",
+  '"':"&quot;","'":"&#39;"
+ })[c]);
+}
+
+function setBusy(form,on){
+ const button=form.querySelector('button[type="submit"]');
+ button.disabled=on;
+ button.textContent=on?"Procesando...":button.dataset.original;
+}
+
+async function loadDashboard(user){
+ currentUser=user;
+ authCard.hidden=true;
+ dashboard.hidden=false;
+
+ $("welcome").textContent="Hola, "+(user.user_metadata?.username || user.email.split("@")[0]);
+ $("accountEmail").textContent=user.email || "";
+
+ const {data:profile,error:profileError}=await db
+  .from("profiles")
+  .select("username,full_name,role")
+  .eq("user_id",user.id)
+  .maybeSingle();
+
+ if(profileError){
+  notify("No se pudo cargar tu perfil: "+profileError.message,"error");
+ }
+
+ $("profileUsername").value=profile?.username || user.user_metadata?.username || "";
+ $("profileFullName").value=profile?.full_name || user.user_metadata?.full_name || "";
+
+ $("adminLink").hidden= !["admin","editor"].includes(profile?.role);
+
+ await loadOrders(user.id);
+}
+
+async function loadOrders(userId){
+ const box=$("ordersList");
+ box.innerHTML='<div class="empty">Consultando tus pedidos...</div>';
+
+ const {data,error}=await db
+  .from("orders")
+  .select("id,order_number,total,status,payment_status,created_at")
+  .eq("customer_user_id",userId)
+  .order("created_at",{ascending:false})
+  .limit(30);
+
+ if(error){
+  box.innerHTML='<div class="empty">No fue posible consultar tus pedidos. '+escapeHTML(error.message)+'</div>';
+  return;
+ }
+
+ if(!data || data.length===0){
+  box.innerHTML='<div class="empty">Todavía no tienes pedidos vinculados a esta cuenta.</div>';
+  return;
+ }
+
+ box.innerHTML=data.map(order=>{
+  const date=order.created_at
+   ? new Date(order.created_at).toLocaleDateString("es-MX")
+   : "Fecha no disponible";
+
+  return `
+   <article class="order">
+    <div class="order-top">
+     <strong>Pedido #${escapeHTML(order.order_number || order.id.slice(0,8))}</strong>
+     <span class="pill">${escapeHTML(order.status)}</span>
+    </div>
+    <p>Importe: <strong>${money(order.total)}</strong></p>
+    <small>Fecha: ${escapeHTML(date)}</small><br>
+    <small>Pago: ${escapeHTML(order.payment_status)}</small>
+   </article>`;
+ }).join("");
+}
+
+// CAMBIAR PANTALLAS
+document.querySelectorAll("[data-mode]").forEach(btn=>{
+ btn.addEventListener("click",()=>mode(btn.dataset.mode));
+});
+
+$("forgotBtn").addEventListener("click",()=>mode("recover"));
+
+// REGISTRO
+$("registerForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ clearMessage();
+
+ const form=e.currentTarget;
+ const username=$("regUsername").value.trim();
+ const fullName=$("regFullName").value.trim();
+ const email=$("regEmail").value.trim().toLowerCase();
+ const phone=$("regPhone").value.trim();
+ const password=$("regPassword").value;
+ const confirm=$("regConfirm").value;
+
+ if(password!==confirm){
+  notify("Las contraseñas no coinciden.","error");
+  return;
+ }
+
+ if(password.length<8){
+  notify("La contraseña debe tener al menos 8 caracteres.","error");
+  return;
+ }
+
+ setBusy(form,true);
+
+ try{
+  const {data,error}=await db.auth.signUp({
+   email,
+   password,
+   options:{
+    emailRedirectTo:location.origin+location.pathname,
+    data:{
+     username,
+     full_name:fullName,
+     phone,
+     marketing_opt_in:false
+    }
+   }
+  });
+
+  if(error) throw error;
+
+  if(data.session && data.user){
+   await loadDashboard(data.user);
+   notify("Tu cuenta fue creada correctamente.");
+  }else{
+   form.reset();
+   notify("Registro recibido. Revisa tu correo electrónico y confirma tu cuenta antes de iniciar sesión.");
+   mode("login");
+  }
+
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(form,false);
+ }
+});
+
+// INICIO DE SESIÓN
+$("loginForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+ clearMessage();
+
+ const form=e.currentTarget;
+ setBusy(form,true);
+
+ try{
+  const {data,error}=await db.auth.signInWithPassword({
+   email:$("loginEmail").value.trim().toLowerCase(),
+   password:$("loginPassword").value
+  });
+
+  if(error) throw error;
+
+  await loadDashboard(data.user);
+
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(form,false);
+ }
+});
+
+// RECUPERAR CONTRASEÑA
+$("recoverForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ const form=e.currentTarget;
+ setBusy(form,true);
+
+ try{
+  const {error}=await db.auth.resetPasswordForEmail(
+   $("recoverEmail").value.trim().toLowerCase(),
+   {
+    redirectTo:location.origin+location.pathname+"?mode=reset"
+   }
+  );
+
+  if(error) throw error;
+
+  notify("Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.");
+
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(form,false);
+ }
+});
+
+// ESTABLECER NUEVA CONTRASEÑA
+$("resetForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ const form=e.currentTarget;
+ const password=$("newPassword").value;
+ const confirm=$("newPasswordConfirm").value;
+
+ if(password!==confirm){
+  notify("Las contraseñas no coinciden.","error");
+  return;
+ }
+
+ if(password.length<8){
+  notify("Utiliza al menos 8 caracteres.","error");
+  return;
+ }
+
+ setBusy(form,true);
+
+ try{
+  const {data,error}=await db.auth.updateUser({password});
+
+  if(error) throw error;
+
+  history.replaceState({},document.title,location.pathname);
+
+  notify("Tu contraseña fue actualizada correctamente.");
+
+  if(data.user) await loadDashboard(data.user);
+
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(form,false);
+ }
+});
+
+// ACTUALIZAR PERFIL
+$("profileForm").addEventListener("submit",async e=>{
+ e.preventDefault();
+
+ if(!currentUser)return;
+
+ const form=e.currentTarget;
+ setBusy(form,true);
+
+ try{
+  const username=$("profileUsername").value.trim();
+  const fullName=$("profileFullName").value.trim();
+
+  if(username.length<3){
+   throw new Error("El usuario debe tener al menos 3 caracteres.");
+  }
+
+  const {error}=await db
+   .from("profiles")
+   .update({username,full_name:fullName})
+   .eq("user_id",currentUser.id);
+
+  if(error) throw error;
+
+  notify("Perfil actualizado correctamente.");
+
+ }catch(error){
+  showError(error);
+ }finally{
+  setBusy(form,false);
+ }
+});
+
+// CERRAR SESIÓN
+$("logoutBtn").addEventListener("click",async()=>{
+ const {error}=await db.auth.signOut();
+
+ if(error){
+  showError(error);
+  return;
+ }
+
+ currentUser=null;
+ dashboard.hidden=true;
+ authCard.hidden=false;
+ $("loginPassword").value="";
+ mode("login");
+ notify("Sesión cerrada correctamente.");
+});
+
+// INICIO Y DETECCIÓN DE RECUPERACIÓN
+async function initialize(){
+
+ if(!db){
+  notify("No se pudo conectar con Supabase. Revisa config.js y js/supabase-client.js.","error");
+  return;
+ }
+
+ const recovery=/type=(recovery|invite)/i.test(location.hash+" "+location.search) ||
+  new URLSearchParams(location.search).get("mode")==="reset";
+
+ try{
+  const {data,error}=await db.auth.getSession();
+  if(error) throw error;
+
+  if(recovery){
+   mode("reset");
+
+   if(!data.session){
+    notify("El enlace de recuperación expiró o no es válido. Solicita uno nuevo.","error");
+   }
+   return;
+  }
+
+  if(data.session?.user){
+   await loadDashboard(data.session.user);
+  }else{
+   mode("login");
+  }
+
+ }catch(error){
+  showError(error);
+ }
+}
+
+initialize();
+
+})();
+</script>
+
+</body>
+</html>
