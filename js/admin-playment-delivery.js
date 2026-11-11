@@ -6,18 +6,48 @@
   const db = window.zeroSupabase;
 
   const defaults = {
+    checkout_title: "Finalizar compra",
+    checkout_intro_title: "Finaliza tu compra",
+    checkout_intro_text: "Confirma tus datos, elige cómo realizar el pago y dónde deseas recibir tus productos.",
+    customer_section_title: "Tus datos",
+
+    payment_section_title: "Método de pago",
+    payment_transfer_label: "Transferencia",
+    payment_transfer_description: "Recibe los datos para realizar tu pago.",
+    payment_whatsapp_label: "Por WhatsApp",
+    payment_whatsapp_description: "Coordina el pago directamente con la tienda.",
+    payment_instructions_title: "Datos e instrucciones de pago",
+
     payment_instructions:
       "Confirma el método de pago por WhatsApp antes de realizar tu pago.",
     payment_security_notice:
       "Verifica que los datos correspondan a ZERO Y NANY - SHOP antes de transferir.",
+
     payment_transfer_enabled: true,
     payment_whatsapp_enabled: true,
     payment_bank_name: "",
     payment_account_holder: "",
     payment_account_number: "",
     payment_clabe: "",
+
+    delivery_section_title: "¿Cómo quieres recibir tus productos?",
+    delivery_whatsapp_label: "Por WhatsApp",
+    delivery_whatsapp_description: "Te contactaremos al número registrado.",
+    delivery_account_label: "En mi cuenta",
+    delivery_account_description: "Consulta tu pedido desde esta página.",
+
+    delivery_whatsapp_message:
+      "Recibirás la información o instrucciones de entrega en el WhatsApp que registraste.",
+    delivery_account_message:
+      "Podrás consultar la información de tu pedido desde esta página.",
+
     delivery_whatsapp_enabled: true,
     delivery_account_enabled: true,
+
+    delivery_eta_title: "Tiempo estimado de entrega",
+    delivery_eta_description:
+      "El tiempo puede variar según la disponibilidad del producto y la confirmación del pago.",
+
     delivery_eta_min: 5,
     delivery_eta_max: 15,
     delivery_eta_unit: "minutes",
@@ -28,32 +58,142 @@
   let adminId = null;
   let saving = false;
 
+  const textFields = {
+    checkout_title: "pdCheckoutTitle",
+    checkout_intro_title: "pdIntroTitle",
+    checkout_intro_text: "pdIntroText",
+    customer_section_title: "pdCustomerTitle",
+
+    payment_section_title: "pdPaymentTitle",
+    payment_transfer_label: "pdTransferLabel",
+    payment_transfer_description: "pdTransferDescription",
+    payment_whatsapp_label: "pdWhatsappLabel",
+    payment_whatsapp_description: "pdWhatsappDescription",
+    payment_instructions_title: "pdInstructionsTitle",
+
+    payment_instructions: "pdInstructions",
+    payment_security_notice: "pdSecurity",
+
+    delivery_section_title: "pdDeliveryTitle",
+    delivery_whatsapp_label: "pdDeliveryWhatsappLabel",
+    delivery_whatsapp_description: "pdDeliveryWhatsappDescription",
+    delivery_account_label: "pdDeliveryAccountLabel",
+    delivery_account_description: "pdDeliveryAccountDescription",
+    delivery_whatsapp_message: "pdWhatsappMessage",
+    delivery_account_message: "pdAccountMessage",
+
+    delivery_eta_title: "pdEtaTitle",
+    delivery_eta_description: "pdEtaDescription",
+    delivery_eta_condition: "pdEtaCondition"
+  };
+
   function injectPanel() {
     if ($("paymentDeliveryCard") || !$("settingsForm")) return;
 
     const style = document.createElement("style");
+
     style.textContent = `
-      .pd-card{margin-top:20px;display:grid;gap:18px}
-      .pd-section{padding:16px;border:1px solid var(--line);
-        border-radius:15px;display:grid;gap:12px}
-      .pd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-      .pd-grid label{display:grid;gap:7px}
-      .pd-grid input,.pd-grid textarea,.pd-grid select{
-        width:100%;box-sizing:border-box}
-      .pd-wide{grid-column:1/-1}
-      .pd-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-      .pd-checks label{display:flex;align-items:center;gap:9px;
-        padding:12px;border:1px solid var(--line);border-radius:12px}
-      .pd-checks input{width:18px;height:18px;accent-color:var(--red)}
-      .pd-card .pd-help{font-size:12px;color:var(--muted);margin:0}
-      @media(max-width:650px){
-        .pd-grid,.pd-checks{grid-template-columns:1fr}
-        .pd-wide{grid-column:auto}
+      .pd-card {
+        margin-top: 22px;
+        display: grid;
+        gap: 20px;
+      }
+
+      .pd-section {
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        display: grid;
+        gap: 14px;
+      }
+
+      .pd-section h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .pd-grid {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 14px;
+      }
+
+      .pd-grid label {
+        display: grid;
+        gap: 7px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .pd-grid input,
+      .pd-grid textarea,
+      .pd-grid select {
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .pd-wide {
+        grid-column: 1/-1;
+      }
+
+      .pd-checks {
+        display: grid;
+        grid-template-columns: repeat(2,minmax(0,1fr));
+        gap: 10px;
+      }
+
+      .pd-checks label {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 13px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+
+      .pd-checks input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--red);
+      }
+
+      .pd-help {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .pd-subtitle {
+        font-size: 13px;
+        color: var(--muted);
+        margin: -5px 0 0;
+      }
+
+      .pd-section + .pd-section {
+        margin-top: 2px;
+      }
+
+      @media(max-width:650px) {
+        .pd-grid,
+        .pd-checks {
+          grid-template-columns: 1fr;
+        }
+
+        .pd-wide {
+          grid-column: auto;
+        }
+
+        .pd-section {
+          padding: 13px;
+        }
       }
     `;
+
     document.head.appendChild(style);
 
     const card = document.createElement("section");
+
     card.id = "paymentDeliveryCard";
     card.className = "panel-card pd-card";
     card.hidden = true;
@@ -62,74 +202,217 @@
       <div>
         <span class="eyebrow">CONFIGURACIÓN DE COMPRA</span>
         <h2>Pagos, recepción y entrega</h2>
-        <p class="pd-help">Administra lo que verá el cliente al finalizar su compra.</p>
+        <p class="pd-help">
+          Personaliza los textos que aparecen en la pantalla de finalizar compra.
+          Los cambios se guardan en Supabase.
+        </p>
       </div>
 
       <form id="paymentDeliveryForm">
 
         <section class="pd-section">
-          <h3>01 · Métodos de pago</h3>
+          <h3>01 · Encabezado de compra</h3>
+          <p class="pd-subtitle">Textos de la parte superior del proceso de compra.</p>
+
+          <div class="pd-grid">
+            <label>
+              Título de la página
+              <input id="pdCheckoutTitle" maxlength="100">
+            </label>
+
+            <label>
+              Título de introducción
+              <input id="pdIntroTitle" maxlength="100">
+            </label>
+
+            <label class="pd-wide">
+              Descripción de compra
+              <textarea id="pdIntroText" rows="3" maxlength="500"></textarea>
+            </label>
+
+            <label class="pd-wide">
+              Título de los datos del cliente
+              <input id="pdCustomerTitle" maxlength="100">
+            </label>
+          </div>
+        </section>
+
+        <section class="pd-section">
+          <h3>02 · Métodos de pago</h3>
+          <p class="pd-subtitle">Activa los métodos disponibles para tus clientes.</p>
+
           <div class="pd-checks">
-            <label><input id="pdTransfer" type="checkbox"> Transferencia bancaria</label>
-            <label><input id="pdWhatsappPay" type="checkbox"> Pago por WhatsApp</label>
+            <label>
+              <input id="pdTransfer" type="checkbox">
+              Transferencia bancaria
+            </label>
+
+            <label>
+              <input id="pdWhatsappPay" type="checkbox">
+              Pago por WhatsApp
+            </label>
           </div>
 
           <div class="pd-grid">
-            <label>Banco
+            <label>
+              Título del apartado
+              <input id="pdPaymentTitle" maxlength="100">
+            </label>
+
+            <label>
+              Nombre de transferencia
+              <input id="pdTransferLabel" maxlength="80">
+            </label>
+
+            <label class="pd-wide">
+              Descripción de transferencia
+              <textarea id="pdTransferDescription" rows="2" maxlength="300"></textarea>
+            </label>
+
+            <label>
+              Nombre de pago por WhatsApp
+              <input id="pdWhatsappLabel" maxlength="80">
+            </label>
+
+            <label class="pd-wide">
+              Descripción de pago por WhatsApp
+              <textarea id="pdWhatsappDescription" rows="2" maxlength="300"></textarea>
+            </label>
+          </div>
+        </section>
+
+        <section class="pd-section">
+          <h3>03 · Datos e instrucciones de pago</h3>
+
+          <div class="pd-grid">
+            <label class="pd-wide">
+              Título de las instrucciones
+              <input id="pdInstructionsTitle" maxlength="100">
+            </label>
+
+            <label class="pd-wide">
+              Texto debajo de las opciones de pago
+              <textarea id="pdInstructions" rows="4" maxlength="1000"></textarea>
+            </label>
+
+            <label class="pd-wide">
+              Aviso de seguridad
+              <textarea id="pdSecurity" rows="3" maxlength="500"></textarea>
+            </label>
+          </div>
+
+          <div class="pd-grid">
+            <label>
+              Banco
               <input id="pdBank" maxlength="100" placeholder="Nombre del banco">
             </label>
-            <label>Titular
-              <input id="pdHolder" maxlength="120" placeholder="Nombre del titular">
+
+            <label>
+              Titular de la cuenta
+              <input id="pdHolder" maxlength="120">
             </label>
-            <label>Número de cuenta
+
+            <label>
+              Número de cuenta
               <input id="pdAccount" maxlength="40">
             </label>
-            <label>CLABE
+
+            <label>
+              CLABE interbancaria
               <input id="pdClabe" maxlength="30" inputmode="numeric">
             </label>
           </div>
         </section>
 
         <section class="pd-section">
-          <h3>02 · Textos que verá el cliente</h3>
-          <div class="pd-grid">
-            <label class="pd-wide">
-              Texto principal debajo de opciones de pago
-              <textarea id="pdInstructions" rows="4" maxlength="1000"></textarea>
-            </label>
-            <label class="pd-wide">
-              Aviso de seguridad
-              <textarea id="pdSecurity" rows="3" maxlength="500"></textarea>
-            </label>
-          </div>
-        </section>
+          <h3>04 · Formas de recibir los productos</h3>
 
-        <section class="pd-section">
-          <h3>03 · Formas de recibir los productos</h3>
           <div class="pd-checks">
-            <label><input id="pdDeliveryWhatsapp" type="checkbox"> Recibir por WhatsApp</label>
-            <label><input id="pdDeliveryAccount" type="checkbox"> Recibir en Mi cuenta</label>
+            <label>
+              <input id="pdDeliveryWhatsapp" type="checkbox">
+              Recibir por WhatsApp
+            </label>
+
+            <label>
+              <input id="pdDeliveryAccount" type="checkbox">
+              Recibir en Mi cuenta
+            </label>
+          </div>
+
+          <div class="pd-grid">
+            <label class="pd-wide">
+              Título del apartado
+              <input id="pdDeliveryTitle" maxlength="120">
+            </label>
+
+            <label>
+              Nombre de entrega por WhatsApp
+              <input id="pdDeliveryWhatsappLabel" maxlength="80">
+            </label>
+
+            <label class="pd-wide">
+              Descripción de entrega por WhatsApp
+              <textarea id="pdDeliveryWhatsappDescription" rows="2" maxlength="300"></textarea>
+            </label>
+
+            <label>
+              Nombre de entrega en Mi cuenta
+              <input id="pdDeliveryAccountLabel" maxlength="80">
+            </label>
+
+            <label class="pd-wide">
+              Descripción de entrega en Mi cuenta
+              <textarea id="pdDeliveryAccountDescription" rows="2" maxlength="300"></textarea>
+            </label>
+
+            <label class="pd-wide">
+              Mensaje cuando el cliente elige WhatsApp
+              <textarea id="pdWhatsappMessage" rows="3" maxlength="500"></textarea>
+            </label>
+
+            <label class="pd-wide">
+              Mensaje cuando el cliente elige Mi cuenta
+              <textarea id="pdAccountMessage" rows="3" maxlength="500"></textarea>
+            </label>
           </div>
         </section>
 
         <section class="pd-section">
-          <h3>04 · Tiempo estimado de entrega</h3>
+          <h3>05 · Tiempo estimado de entrega</h3>
+
           <div class="pd-grid">
-            <label>Tiempo mínimo
+            <label>
+              Título del apartado
+              <input id="pdEtaTitle" maxlength="100">
+            </label>
+
+            <label>
+              Tiempo mínimo
               <input id="pdEtaMin" type="number" min="0" max="9999" required>
             </label>
-            <label>Tiempo máximo
+
+            <label>
+              Tiempo máximo
               <input id="pdEtaMax" type="number" min="0" max="9999" required>
             </label>
-            <label>Unidad
+
+            <label>
+              Unidad de tiempo
               <select id="pdEtaUnit">
                 <option value="minutes">Minutos</option>
                 <option value="hours">Horas</option>
                 <option value="days">Días</option>
               </select>
             </label>
-            <label class="pd-wide">Condición de entrega
-              <textarea id="pdEtaCondition" rows="2" maxlength="180"></textarea>
+
+            <label class="pd-wide">
+              Descripción del tiempo estimado
+              <textarea id="pdEtaDescription" rows="3" maxlength="500"></textarea>
+            </label>
+
+            <label class="pd-wide">
+              Condición de entrega
+              <textarea id="pdEtaCondition" rows="2" maxlength="300"></textarea>
             </label>
           </div>
         </section>
@@ -139,6 +422,7 @@
         </button>
 
         <div id="pdMessage" class="form-message" role="status"></div>
+
       </form>
     `;
 
@@ -162,6 +446,7 @@
   function showMessage(text, ok = false) {
     const el = $("pdMessage");
     if (!el) return;
+
     el.textContent = text;
     el.className = "form-message" + (ok ? " ok" : "");
   }
@@ -169,20 +454,21 @@
   function fill(data) {
     const d = { ...defaults, ...data };
 
-    $("pdTransfer").checked = d.payment_transfer_enabled !== false;
-    $("pdWhatsappPay").checked = d.payment_whatsapp_enabled !== false;
+    Object.entries(textFields).forEach(([key, id]) => {
+      const el = $(id);
+      if (el) el.value = d[key] ?? "";
+    });
+
+    $("pdTransfer").checked =
+      d.payment_transfer_enabled !== false;
+
+    $("pdWhatsappPay").checked =
+      d.payment_whatsapp_enabled !== false;
 
     $("pdBank").value = d.payment_bank_name || "";
     $("pdHolder").value = d.payment_account_holder || "";
     $("pdAccount").value = d.payment_account_number || "";
     $("pdClabe").value = d.payment_clabe || "";
-
-    $("pdInstructions").value = d.payment_instructions;
-    $("pdSecurity").value = d.payment_security_notice;
-
-    if ($("settingPayment")) {
-      $("settingPayment").value = d.payment_instructions;
-    }
 
     $("pdDeliveryWhatsapp").checked =
       d.delivery_whatsapp_enabled !== false;
@@ -193,7 +479,10 @@
     $("pdEtaMin").value = d.delivery_eta_min;
     $("pdEtaMax").value = d.delivery_eta_max;
     $("pdEtaUnit").value = d.delivery_eta_unit;
-    $("pdEtaCondition").value = d.delivery_eta_condition;
+
+    if ($("settingPayment")) {
+      $("settingPayment").value = d.payment_instructions;
+    }
   }
 
   async function verifyAdmin(session) {
@@ -205,7 +494,10 @@
       .eq("user_id", session.user.id)
       .maybeSingle();
 
-    if (error || data?.role !== "admin") return false;
+    if (error || data?.role !== "admin") {
+      adminId = null;
+      return false;
+    }
 
     adminId = session.user.id;
     return true;
@@ -235,52 +527,78 @@
     }
 
     fill(data);
-    showMessage("Configuración cargada.", true);
+    showMessage("Configuración cargada correctamente.", true);
   }
 
   async function saveSettings(event) {
     event.preventDefault();
+
     if (saving) return;
 
     const min = Number($("pdEtaMin").value);
     const max = Number($("pdEtaMax").value);
 
-    if (!Number.isInteger(min) || !Number.isInteger(max) ||
-        min < 0 || max < min) {
+    if (
+      !Number.isInteger(min) ||
+      !Number.isInteger(max) ||
+      min < 0 ||
+      max < min
+    ) {
       showMessage("El tiempo máximo debe ser igual o mayor al mínimo.");
+      return;
+    }
+
+    if (
+      !$("pdTransfer").checked &&
+      !$("pdWhatsappPay").checked
+    ) {
+      showMessage("Activa al menos un método de pago.");
+      return;
+    }
+
+    if (
+      !$("pdDeliveryWhatsapp").checked &&
+      !$("pdDeliveryAccount").checked
+    ) {
+      showMessage("Activa al menos una forma de recibir los productos.");
       return;
     }
 
     const { data: sessionData, error: sessionError } =
       await db.auth.getSession();
 
-    if (sessionError ||
-        !sessionData.session ||
-        sessionData.session.user.id !== adminId ||
-        !await verifyAdmin(sessionData.session)) {
+    if (
+      sessionError ||
+      !sessionData.session ||
+      sessionData.session.user.id !== adminId ||
+      !await verifyAdmin(sessionData.session)
+    ) {
       showMessage("Tu sesión de administrador no es válida.");
       return;
     }
 
-    const update = {
+    const update = {};
+
+    Object.entries(textFields).forEach(([key, id]) => {
+      update[key] = $(id).value.trim();
+    });
+
+    Object.assign(update, {
       payment_transfer_enabled: $("pdTransfer").checked,
       payment_whatsapp_enabled: $("pdWhatsappPay").checked,
+
       payment_bank_name: $("pdBank").value.trim(),
       payment_account_holder: $("pdHolder").value.trim(),
       payment_account_number: $("pdAccount").value.trim(),
       payment_clabe: $("pdClabe").value.trim(),
-
-      payment_instructions: $("pdInstructions").value.trim(),
-      payment_security_notice: $("pdSecurity").value.trim(),
 
       delivery_whatsapp_enabled: $("pdDeliveryWhatsapp").checked,
       delivery_account_enabled: $("pdDeliveryAccount").checked,
 
       delivery_eta_min: min,
       delivery_eta_max: max,
-      delivery_eta_unit: $("pdEtaUnit").value,
-      delivery_eta_condition: $("pdEtaCondition").value.trim()
-    };
+      delivery_eta_unit: $("pdEtaUnit").value
+    });
 
     saving = true;
     $("pdSave").disabled = true;
@@ -298,7 +616,10 @@
         $("settingPayment").value = update.payment_instructions;
       }
 
-      showMessage("Configuración guardada correctamente.", true);
+      showMessage(
+        "¡Configuración guardada correctamente!",
+        true
+      );
 
     } catch (error) {
       showMessage("No se pudo guardar: " + error.message);
@@ -313,17 +634,24 @@
 
     if (!db || !$("paymentDeliveryForm")) return;
 
-    const { data } = await db.auth.getSession();
+    const { data, error } = await db.auth.getSession();
+
+    if (error) {
+      showMessage(error.message);
+      return;
+    }
+
     await loadSettings(data.session);
 
     db.auth.onAuthStateChange((event, session) => {
       setTimeout(() => {
-        loadSettings(session).catch(error =>
-          showMessage(error.message)
-        );
+        loadSettings(session).catch(error => {
+          showMessage(error.message);
+        });
       }, 0);
     });
   }
 
   init();
+
 })();
