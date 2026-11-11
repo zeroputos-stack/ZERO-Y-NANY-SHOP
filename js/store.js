@@ -11,30 +11,34 @@
     whatsapp_number: "526623459707",
     announcement: "Tu tienda digital, siempre disponible.",
     payment_instructions: "Confirma con la tienda los datos para realizar tu transferencia.",
+    payment_security_notice: "Verifica que los datos correspondan a ZERO Y NANY - SHOP antes de transferir.",
+    payment_transfer_enabled: true,
+    payment_whatsapp_enabled: true,
+    payment_bank_name: "",
+    payment_account_holder: "",
+    payment_account_number: "",
+    payment_clabe: "",
+    delivery_whatsapp_enabled: true,
+    delivery_account_enabled: true,
+    delivery_eta_min: 5,
+    delivery_eta_max: 15,
+    delivery_eta_unit: "minutes",
+    delivery_eta_condition: "después de confirmar el pago y la disponibilidad del producto",
     design: {}
   };
 
   let category = "Todas";
 
-  const DELIVERY_ETA_TEXT =
-    "El plazo se confirmará después de validar el pago y la disponibilidad del producto.";
-
   function readCart() {
     try {
-      const saved = JSON.parse(
-        localStorage.getItem("zeroShopCloudCart") || "[]"
-      );
-
+      const saved = JSON.parse(localStorage.getItem("zeroShopCloudCart") || "[]");
       if (!Array.isArray(saved)) return [];
 
       return saved
         .filter(item => item && typeof item.product_id === "string")
         .map(item => ({
           product_id: item.product_id,
-          quantity: Math.max(
-            1,
-            Math.min(20, Number.parseInt(item.quantity, 10) || 1)
-          )
+          quantity: Math.max(1, Math.min(20, Number.parseInt(item.quantity, 10) || 1))
         }));
     } catch {
       return [];
@@ -66,11 +70,7 @@
     element.classList.add("show");
 
     clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(
-      () => element.classList.remove("show"),
-      2800
-    );
+    toastTimer = setTimeout(() => element.classList.remove("show"), 2800);
   }
 
   function imageUrl(path) {
@@ -81,14 +81,210 @@
       .getPublicUrl(path).data.publicUrl || "";
   }
 
-  const waLink = (
-    message = "Hola, quiero información de ZERO Y NANY - SHOP."
-  ) => {
-    const phone = String(settings.whatsapp_number || "")
-      .replace(/\D/g, "");
-
+  const waLink = (message = "Hola, quiero información de ZERO Y NANY - SHOP.") => {
+    const phone = String(settings.whatsapp_number || "").replace(/\D/g, "");
     return `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   };
+
+  // ==========================================
+  // TIEMPO ESTIMADO DE ENTREGA
+  // ==========================================
+
+  function deliveryEtaText() {
+    const min = Math.max(0, Number(settings.delivery_eta_min ?? 5));
+    const max = Math.max(min, Number(settings.delivery_eta_max ?? min));
+
+    const unit = settings.delivery_eta_unit || "minutes";
+
+    const labels = {
+      minutes: ["minuto", "minutos"],
+      hours: ["hora", "horas"],
+      days: ["día", "días"]
+    };
+
+    const unitLabels = labels[unit] || labels.minutes;
+
+    const range = min === max
+      ? `${min} ${min === 1 ? unitLabels[0] : unitLabels[1]}`
+      : `${min} a ${max} ${unitLabels[1]}`;
+
+    const condition = String(settings.delivery_eta_condition || "").trim();
+
+    return `${range}${condition ? ` ${condition}` : ""}.`;
+  }
+
+  // ==========================================
+  // INSTRUCCIONES DE PAGO
+  // ==========================================
+
+  function transferInstructionsText() {
+    const details = [
+      settings.payment_bank_name ? `Banco: ${settings.payment_bank_name}` : "",
+      settings.payment_account_holder ? `Titular: ${settings.payment_account_holder}` : "",
+      settings.payment_account_number ? `Cuenta: ${settings.payment_account_number}` : "",
+      settings.payment_clabe ? `CLABE: ${settings.payment_clabe}` : ""
+    ].filter(Boolean);
+
+    return [
+      settings.payment_instructions ||
+      "Confirma con la tienda los datos para realizar tu transferencia.",
+      ...details
+    ].filter(Boolean).join("\n");
+  }
+
+  // Actualiza los dos mensajes editables desde el panel administrativo.
+  function applyPaymentCopy() {
+    const instructions = $("paymentInstructionsText");
+    const securityNotice = $("paymentSecurityNotice");
+
+    if (instructions) {
+      instructions.textContent = transferInstructionsText();
+    }
+
+    if (securityNotice) {
+      securityNotice.textContent = String(
+        settings.payment_security_notice ??
+        "Verifica que los datos correspondan a ZERO Y NANY - SHOP antes de transferir."
+      );
+    }
+  }
+
+  // ==========================================
+  // AVISOS DE CONFIGURACIÓN
+  // ==========================================
+
+  function ensureCheckoutNotice(id, reference, text, visible) {
+    if (!reference) return;
+
+    let notice = $(id);
+
+    if (!notice) {
+      notice = document.createElement("div");
+      notice.id = id;
+      notice.className = "delivery-hint";
+      reference.insertAdjacentElement("afterend", notice);
+    }
+
+    notice.textContent = text;
+    notice.hidden = !visible;
+  }
+
+  // ==========================================
+  // MÉTODOS DE PAGO Y ENTREGA
+  // ==========================================
+
+  function applyPaymentDeliverySettings() {
+    const transferInput = document.querySelector(
+      'input[name="paymentMethod"][value="transfer"]'
+    );
+
+    const whatsappPaymentInput = document.querySelector(
+      'input[name="paymentMethod"][value="whatsapp"]'
+    );
+
+    const whatsappDeliveryInput = document.querySelector(
+      'input[name="deliveryMethod"][value="whatsapp"]'
+    );
+
+    const accountDeliveryInput = document.querySelector(
+      'input[name="deliveryMethod"][value="account"]'
+    );
+
+    const transferEnabled = settings.payment_transfer_enabled !== false;
+    const whatsappPaymentEnabled = settings.payment_whatsapp_enabled !== false;
+
+    const whatsappDeliveryEnabled = settings.delivery_whatsapp_enabled !== false;
+    const accountDeliveryEnabled = settings.delivery_account_enabled !== false;
+
+    if (transferInput?.closest(".choice-card")) {
+      transferInput.closest(".choice-card").hidden = !transferEnabled;
+    }
+
+    if (whatsappPaymentInput?.closest(".choice-card")) {
+      whatsappPaymentInput.closest(".choice-card").hidden = !whatsappPaymentEnabled;
+    }
+
+    if (whatsappDeliveryInput?.closest(".choice-card")) {
+      whatsappDeliveryInput.closest(".choice-card").hidden = !whatsappDeliveryEnabled;
+    }
+
+    if (accountDeliveryInput?.closest(".choice-card")) {
+      accountDeliveryInput.closest(".choice-card").hidden = !accountDeliveryEnabled;
+    }
+
+    const paymentGrid = transferInput?.closest(".choice-grid");
+    const deliveryGrid = whatsappDeliveryInput?.closest(".choice-grid");
+
+    ensureCheckoutNotice(
+      "paymentUnavailableNotice",
+      paymentGrid,
+      "Por el momento no hay métodos de pago habilitados. Contacta a la tienda para recibir ayuda.",
+      !transferEnabled && !whatsappPaymentEnabled
+    );
+
+    ensureCheckoutNotice(
+      "deliveryUnavailableNotice",
+      deliveryGrid,
+      "Por el momento no hay modalidades de entrega habilitadas. Contacta a la tienda.",
+      !whatsappDeliveryEnabled && !accountDeliveryEnabled
+    );
+
+    const selectedPayment = document.querySelector(
+      'input[name="paymentMethod"]:checked'
+    );
+
+    if (
+      !selectedPayment ||
+      (selectedPayment.value === "transfer" && !transferEnabled) ||
+      (selectedPayment.value === "whatsapp" && !whatsappPaymentEnabled)
+    ) {
+      const next = transferEnabled
+        ? transferInput
+        : whatsappPaymentEnabled
+          ? whatsappPaymentInput
+          : null;
+
+      if (next) next.checked = true;
+      else if (selectedPayment) selectedPayment.checked = false;
+    }
+
+    const selectedDelivery = document.querySelector(
+      'input[name="deliveryMethod"]:checked'
+    );
+
+    if (
+      !selectedDelivery ||
+      (selectedDelivery.value === "whatsapp" && !whatsappDeliveryEnabled) ||
+      (selectedDelivery.value === "account" && !accountDeliveryEnabled)
+    ) {
+      const next = whatsappDeliveryEnabled
+        ? whatsappDeliveryInput
+        : accountDeliveryEnabled
+          ? accountDeliveryInput
+          : null;
+
+      if (next) next.checked = true;
+      else if (selectedDelivery) selectedDelivery.checked = false;
+    }
+
+    const placeButton = $("placeOrderBtn");
+
+    if (placeButton) {
+      placeButton.disabled =
+        (!transferEnabled && !whatsappPaymentEnabled) ||
+        (!whatsappDeliveryEnabled && !accountDeliveryEnabled);
+    }
+
+    if ($("deliveryEtaText")) {
+      $("deliveryEtaText").textContent = deliveryEtaText();
+    }
+
+    updatePaymentUI();
+  }
+
+  // ==========================================
+  // ADVERTENCIA DE CONEXIÓN
+  // ==========================================
 
   function showConfigWarning(message) {
     const status = $("storeStatus");
@@ -110,6 +306,10 @@
     }
   }
 
+  // ==========================================
+  // DISEÑO DE LA TIENDA
+  // ==========================================
+
   const defaultDesign = {
     theme: {
       accent: "#ff315d",
@@ -122,8 +322,7 @@
     content: {
       badge: "TIENDA DIGITAL · ZERO Y NANY - SHOP",
       hero_title: "Lo que buscas, en un solo lugar.",
-      hero_subtitle:
-        "Explora el catálogo, revisa la disponibilidad y envía tu pedido de forma sencilla. Tus compras quedan registradas para darles seguimiento.",
+      hero_subtitle: "Explora el catálogo, revisa la disponibilidad y envía tu pedido de forma sencilla. Tus compras quedan registradas para darles seguimiento.",
       hero_cta: "Explorar catálogo",
       hero_image_path: null
     },
@@ -135,12 +334,7 @@
       contacto: true
     },
 
-    order: [
-      "hero",
-      "catalogo",
-      "como-comprar",
-      "contacto"
-    ]
+    order: ["hero", "catalogo", "como-comprar", "contacto"]
   };
 
   function applyStoreDesign(raw = {}) {
@@ -174,16 +368,13 @@
       : `"${design.theme.font}", system-ui, sans-serif`;
 
     root.style.setProperty("--store-font", font);
+
     document.body.style.fontFamily = "var(--store-font)";
 
     const setText = (id, value) => {
       const element = $(id);
 
-      if (
-        element &&
-        value !== undefined &&
-        value !== null
-      ) {
+      if (element && value !== undefined && value !== null) {
         element.textContent = value;
       }
     };
@@ -191,8 +382,7 @@
     const badge = $("heroBadge");
 
     if (badge) {
-      const dot =
-        badge.querySelector("i") || document.createElement("i");
+      const dot = badge.querySelector("i") || document.createElement("i");
 
       badge.replaceChildren(
         dot,
@@ -205,16 +395,12 @@
     setText("heroCtaLabel", design.content.hero_cta);
 
     document.querySelectorAll("[data-store-name]").forEach(element => {
-      element.textContent =
-        settings.store_name || "ZERO Y NANY - SHOP";
+      element.textContent = settings.store_name || "ZERO Y NANY - SHOP";
     });
 
     const heroImage = $("heroImage");
 
-    if (
-      heroImage &&
-      design.content.hero_image_path
-    ) {
+    if (heroImage && design.content.hero_image_path) {
       heroImage.src = imageUrl(design.content.hero_image_path);
     }
 
@@ -239,15 +425,17 @@
       });
     }
 
-    const meta = document.querySelector(
-      'meta[name="description"]'
-    );
+    const meta = document.querySelector('meta[name="description"]');
 
     if (meta) {
       meta.content =
         `${settings.store_name || "ZERO Y NANY - SHOP"}: tienda digital, catálogo y pedidos.`;
     }
   }
+
+  // ==========================================
+  // CARGAR CONFIGURACIÓN
+  // ==========================================
 
   async function loadSettings() {
     const { data, error } = await supabase
@@ -280,12 +468,16 @@
       $("year").textContent = new Date().getFullYear();
     }
 
-    if ($("paymentInstructionsText")) {
-      $("paymentInstructionsText").textContent =
-        settings.payment_instructions ||
-        "Confirma con la tienda los datos para realizar tu transferencia.";
-    }
+    // ACTUALIZAR MENSAJES DE PAGO Y SEGURIDAD
+    applyPaymentCopy();
+
+    // ACTUALIZAR MÉTODOS Y TIEMPO DE ENTREGA
+    applyPaymentDeliverySettings();
   }
+
+  // ==========================================
+  // CARGAR PRODUCTOS
+  // ==========================================
 
   async function loadProducts() {
     const { data, error } = await supabase
@@ -299,13 +491,9 @@
 
     products = data || [];
 
-    const availableIds = new Set(
-      products.map(product => product.id)
-    );
+    const availableIds = new Set(products.map(product => product.id));
 
-    cart = cart.filter(
-      item => availableIds.has(item.product_id)
-    );
+    cart = cart.filter(item => availableIds.has(item.product_id));
 
     saveCart();
 
@@ -316,6 +504,10 @@
     renderFilters();
     renderProducts();
   }
+
+  // ==========================================
+  // FILTROS
+  // ==========================================
 
   function renderFilters() {
     const container = $("categoryFilters");
@@ -333,8 +525,9 @@
       <button
         type="button"
         class="category-filter ${category === name ? "active" : ""}"
-        data-category="${safe(name)}"
-      >${safe(name)}</button>
+        data-category="${safe(name)}">
+        ${safe(name)}
+      </button>
     `).join("");
 
     container.querySelectorAll("[data-category]").forEach(button => {
@@ -346,26 +539,26 @@
     });
   }
 
+  // ==========================================
+  // CATÁLOGO
+  // ==========================================
+
   function renderProducts() {
     const grid = $("productGrid");
 
     if (!grid) return;
 
-    const search = (
-      $("searchInput")?.value || ""
-    ).trim().toLowerCase();
+    const search = ($("searchInput")?.value || "").trim().toLowerCase();
 
     const filtered = products.filter(product =>
       (category === "Todas" || product.category === category) &&
       `${product.name} ${product.category} ${product.duration} ${product.modality} ${product.description}`
-        .toLowerCase()
-        .includes(search)
+        .toLowerCase().includes(search)
     );
 
     grid.innerHTML = filtered.map(product => {
       const outOfStock =
-        product.stock !== null &&
-        Number(product.stock) <= 0;
+        product.stock !== null && Number(product.stock) <= 0;
 
       const stockText = outOfStock
         ? "Agotado"
@@ -384,6 +577,7 @@
 
       return `
         <article class="product-card">
+
           <div class="product-image">
             ${
               image
@@ -394,6 +588,7 @@
 
           <div class="product-meta">
             <span class="product-category">${safe(product.category)}</span>
+
             <span class="stock-tag ${outOfStock ? "out" : product.stock === null ? "unknown" : ""}">
               ${safe(stockText)}
             </span>
@@ -413,14 +608,17 @@
             type="button"
             class="btn btn-primary"
             data-add="${safe(product.id)}"
-            ${outOfStock ? "disabled" : ""}
-          >
+            ${outOfStock ? "disabled" : ""}>
             ${outOfStock ? "Agotado" : "Agregar al carrito"}
           </button>
+
         </article>
       `;
-    }).join("") ||
-      `<div class="empty-products">No encontramos productos con esa búsqueda.</div>`;
+    }).join("") || `
+      <div class="empty-products">
+        No encontramos productos con esa búsqueda.
+      </div>
+    `;
 
     grid.querySelectorAll("[data-add]").forEach(button => {
       button.addEventListener("click", () => {
@@ -428,6 +626,10 @@
       });
     });
   }
+
+  // ==========================================
+  // CARRITO
+  // ==========================================
 
   function cartLines() {
     return cart.map(item => {
@@ -437,10 +639,7 @@
 
       if (!product) return null;
 
-      const quantity = Math.max(
-        1,
-        Number(item.quantity) || 1
-      );
+      const quantity = Math.max(1, Number(item.quantity) || 1);
 
       return {
         ...item,
@@ -458,14 +657,8 @@
     return {
       lines,
       unique: lines.length,
-      units: lines.reduce(
-        (sum, item) => sum + item.quantity,
-        0
-      ),
-      total: lines.reduce(
-        (sum, item) => sum + item.lineTotal,
-        0
-      )
+      units: lines.reduce((sum, item) => sum + item.quantity, 0),
+      total: lines.reduce((sum, item) => sum + item.lineTotal, 0)
     };
   }
 
@@ -502,18 +695,13 @@
   }
 
   function addToCart(id) {
-    const product = products.find(
-      item => item.id === id
-    );
+    const product = products.find(item => item.id === id);
 
     if (!product) return;
 
-    const existing = cart.find(
-      item => item.product_id === id
-    );
+    const existing = cart.find(item => item.product_id === id);
 
-    const nextQuantity =
-      (existing?.quantity || 0) + 1;
+    const nextQuantity = (existing?.quantity || 0) + 1;
 
     if (
       product.stock !== null &&
@@ -534,6 +722,7 @@
 
     resetCheckoutView();
     saveCart();
+
     toast("Producto agregado al carrito.");
   }
 
@@ -590,6 +779,7 @@
     itemsElement.innerHTML = totals.lines.length
       ? totals.lines.map(item => `
           <article class="cart-line">
+
             <div class="cart-line-image">
               ${
                 item.image
@@ -599,6 +789,7 @@
             </div>
 
             <div class="cart-line-info">
+
               <strong>${safe(item.product.name)}</strong>
 
               <small>
@@ -610,19 +801,30 @@
               <small>${money(item.product.price)} por unidad</small>
 
               <div class="cart-line-actions">
+
                 <button type="button" data-minus="${safe(item.product_id)}" aria-label="Quitar una unidad">−</button>
+
                 <b>${item.quantity}</b>
+
                 <button type="button" data-plus="${safe(item.product_id)}" aria-label="Agregar una unidad">+</button>
+
                 <button type="button" class="remove-line" data-remove="${safe(item.product_id)}" aria-label="Eliminar producto">×</button>
+
               </div>
+
             </div>
 
             <div class="cart-line-price">
               ${money(item.lineTotal)}
             </div>
+
           </article>
         `).join("")
-      : `<div class="empty-list">Tu carrito está vacío. Explora el catálogo y agrega los productos que deseas comprar.</div>`;
+      : `
+        <div class="empty-list">
+          Tu carrito está vacío. Explora el catálogo y agrega los productos que deseas comprar.
+        </div>
+      `;
 
     itemsElement.querySelectorAll("[data-minus]").forEach(button => {
       button.addEventListener("click", () => {
@@ -649,28 +851,23 @@
   }
 
   function changeQty(id, delta) {
-    const line = cart.find(
-      item => item.product_id === id
-    );
-
-    const product = products.find(
-      item => item.id === id
-    );
+    const line = cart.find(item => item.product_id === id);
+    const product = products.find(item => item.id === id);
 
     if (!line || !product) return;
 
     const nextQuantity = line.quantity + delta;
 
     if (nextQuantity <= 0) {
-      cart = cart.filter(
-        item => item.product_id !== id
-      );
+      cart = cart.filter(item => item.product_id !== id);
+
     } else if (
       product.stock !== null &&
       nextQuantity > Number(product.stock)
     ) {
       toast("No hay más existencias disponibles.");
       return;
+
     } else {
       line.quantity = nextQuantity;
     }
@@ -684,9 +881,12 @@
     $("cartDrawer")?.classList.toggle("open", open);
     $("cartBackdrop")?.classList.toggle("open", open);
 
-    document.body.style.overflow =
-      open ? "hidden" : "";
+    document.body.style.overflow = open ? "hidden" : "";
   }
+
+  // ==========================================
+  // MÉTODO DE PAGO SELECCIONADO
+  // ==========================================
 
   function selectedRadio(name, fallback) {
     return document.querySelector(
@@ -697,7 +897,9 @@
   function updatePaymentUI() {
     const method = selectedRadio(
       "paymentMethod",
-      "transfer"
+      settings.payment_transfer_enabled === false
+        ? "whatsapp"
+        : "transfer"
     );
 
     const instructions = $("transferInstructions");
@@ -706,12 +908,13 @@
       instructions.hidden = method !== "transfer";
     }
 
-    if ($("paymentInstructionsText")) {
-      $("paymentInstructionsText").textContent =
-        settings.payment_instructions ||
-        "Solicita a la tienda los datos para realizar tu transferencia.";
-    }
+    // Actualiza los mensajes configurados por el administrador.
+    applyPaymentCopy();
   }
+
+  // ==========================================
+  // FORMA DE ENTREGA
+  // ==========================================
 
   async function updateDeliveryUI() {
     const hint = $("accountDeliveryHint");
@@ -720,24 +923,27 @@
 
     const method = selectedRadio(
       "deliveryMethod",
-      "whatsapp"
+      settings.delivery_whatsapp_enabled === false
+        ? "account"
+        : "whatsapp"
     );
 
     if (method !== "account") {
       hint.textContent =
         "Recibirás la información o instrucciones de entrega en el WhatsApp que registraste.";
+
       return;
     }
 
     if (!supabase?.auth?.getSession) {
       hint.innerHTML =
         `Para recibir tus productos en tu cuenta necesitas <a href="account.html">iniciar sesión o registrarte</a>.`;
+
       return;
     }
 
     try {
-      const { data, error } =
-        await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
 
       if (error) throw error;
 
@@ -748,11 +954,16 @@
         hint.innerHTML =
           `Para recibir tus productos en la página, primero <a href="account.html">inicia sesión o regístrate</a>. Tu carrito se conservará en este dispositivo.`;
       }
+
     } catch {
       hint.innerHTML =
         `No pudimos comprobar tu sesión. <a href="account.html">Entra a Mi cuenta</a> y vuelve a intentarlo.`;
     }
   }
+
+  // ==========================================
+  // FINALIZAR COMPRA
+  // ==========================================
 
   function showCheckout() {
     if (!cart.length) {
@@ -763,20 +974,26 @@
     $("cartView").hidden = true;
     $("checkoutView").hidden = false;
     $("checkoutResult").hidden = true;
+
     $("drawerTitle").textContent = "Finalizar compra";
 
+    applyPaymentDeliverySettings();
+
     if ($("deliveryEtaText")) {
-      $("deliveryEtaText").textContent = DELIVERY_ETA_TEXT;
+      $("deliveryEtaText").textContent = deliveryEtaText();
     }
 
     if ($("checkoutTotal")) {
-      $("checkoutTotal").textContent =
-        money(cartTotals().total);
+      $("checkoutTotal").textContent = money(cartTotals().total);
     }
 
     updatePaymentUI();
     updateDeliveryUI();
   }
+
+  // ==========================================
+  // MENSAJE DE WHATSAPP DEL PEDIDO
+  // ==========================================
 
   function makeOrderWhatsappMessage(
     order,
@@ -802,6 +1019,10 @@
     ].join("\n");
   }
 
+  // ==========================================
+  // REGISTRAR PEDIDO EN SUPABASE
+  // ==========================================
+
   async function placeOrder(event) {
     event.preventDefault();
 
@@ -824,13 +1045,33 @@
 
     const paymentMethod = selectedRadio(
       "paymentMethod",
-      "transfer"
+      settings.payment_transfer_enabled === false
+        ? "whatsapp"
+        : "transfer"
     );
 
     const deliveryMethod = selectedRadio(
       "deliveryMethod",
-      "whatsapp"
+      settings.delivery_whatsapp_enabled === false
+        ? "account"
+        : "whatsapp"
     );
+
+    if (
+      (paymentMethod === "transfer" && settings.payment_transfer_enabled === false) ||
+      (paymentMethod === "whatsapp" && settings.payment_whatsapp_enabled === false)
+    ) {
+      toast("Elige un método de pago habilitado por la tienda.");
+      return;
+    }
+
+    if (
+      (deliveryMethod === "whatsapp" && settings.delivery_whatsapp_enabled === false) ||
+      (deliveryMethod === "account" && settings.delivery_account_enabled === false)
+    ) {
+      toast("Elige una modalidad de entrega habilitada por la tienda.");
+      return;
+    }
 
     if (customer.name.length < 2) {
       toast("Escribe tu nombre completo.");
@@ -844,8 +1085,7 @@
 
     if (deliveryMethod === "account") {
       try {
-        const { data, error } =
-          await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getSession();
 
         if (error) throw error;
 
@@ -854,32 +1094,30 @@
           await updateDeliveryUI();
           return;
         }
+
       } catch (error) {
         toast(
           error?.message ||
           "No pudimos verificar tu sesión. Entra a Mi cuenta."
         );
+
         return;
       }
     }
 
-    const paymentLabel =
-      paymentMethod === "transfer"
-        ? "Transferencia bancaria"
-        : "Coordinar pago por WhatsApp";
+    const paymentLabel = paymentMethod === "transfer"
+      ? "Transferencia bancaria"
+      : "Coordinar pago por WhatsApp";
 
-    const deliveryLabel =
-      deliveryMethod === "account"
-        ? "Cuenta del cliente en la página"
-        : "WhatsApp";
+    const deliveryLabel = deliveryMethod === "account"
+      ? "Cuenta del cliente en la página"
+      : "WhatsApp";
 
     const notesParts = [
       `Método de pago: ${paymentLabel}`,
       `Forma de entrega: ${deliveryLabel}`,
-      `Tiempo estimado: ${DELIVERY_ETA_TEXT}`,
-      customer.notes
-        ? `Notas del cliente: ${customer.notes}`
-        : ""
+      `Tiempo estimado: ${deliveryEtaText()}`,
+      customer.notes ? `Notas del cliente: ${customer.notes}` : ""
     ].filter(Boolean);
 
     const payload = {
@@ -926,57 +1164,105 @@
 
       $("cartView").hidden = true;
       $("checkoutView").hidden = true;
+
       $("drawerTitle").textContent = "Pedido registrado";
 
       const result = $("checkoutResult");
 
-      const paymentHtml =
-        paymentMethod === "transfer"
-          ? `
-            <div class="payment-instructions">
-              <strong>Instrucciones para tu transferencia</strong>
-              <p>${safe(settings.payment_instructions || "Contacta a la tienda para confirmar los datos de pago.")}</p>
-              <small>Una vez realizado el pago, envía tu comprobante para validación.</small>
-            </div>
-          `
-          : `
-            <p>Elegiste coordinar el pago por WhatsApp. Usa el botón para enviar los datos de tu pedido a la tienda.</p>
-          `;
+      const paymentHtml = paymentMethod === "transfer"
+        ? `
+          <div class="payment-instructions">
 
-      const deliveryHtml =
-        deliveryMethod === "account"
-          ? `
-            <p>La entrega quedó solicitada en tu cuenta. Entra a <b>Mi cuenta</b> para consultar el seguimiento del pedido.</p>
-          `
-          : `
-            <p>La entrega se coordinará por WhatsApp al número <b>${safe(customer.whatsapp)}</b>. El plazo se confirmará después de validar el pago.</p>
-          `;
+            <strong>Instrucciones para tu transferencia</strong>
+
+            <p>${safe(transferInstructionsText())}</p>
+
+            <small>
+              ${safe(
+                settings.payment_security_notice ??
+                "Verifica que los datos correspondan a ZERO Y NANY - SHOP antes de transferir."
+              )}
+            </small>
+
+          </div>
+        `
+        : `
+          <p>
+            Elegiste coordinar el pago por WhatsApp.
+            Usa el botón para enviar los datos de tu pedido a la tienda.
+          </p>
+        `;
+
+      const deliveryHtml = deliveryMethod === "account"
+        ? `
+          <p>
+            La entrega quedó solicitada en tu cuenta.
+            Entra a <b>Mi cuenta</b> para consultar el seguimiento del pedido.
+          </p>
+
+          <p>
+            <b>Tiempo estimado:</b> ${safe(deliveryEtaText())}
+          </p>
+        `
+        : `
+          <p>
+            La entrega se coordinará por WhatsApp al número
+            <b>${safe(customer.whatsapp)}</b>.
+          </p>
+
+          <p>
+            <b>Tiempo estimado:</b> ${safe(deliveryEtaText())}
+          </p>
+        `;
 
       result.innerHTML = `
         <h3>¡Pedido registrado!</h3>
-        <p><b>Folio:</b> ${safe(order.order_number)}</p>
-        <p><b>Total:</b> ${money(order.total)} MXN</p>
+
+        <p>
+          <b>Folio:</b> ${safe(order.order_number)}
+        </p>
+
+        <p>
+          <b>Total:</b> ${money(order.total)} MXN
+        </p>
+
         ${paymentHtml}
+
         ${deliveryHtml}
+
         <div class="result-actions">
-          <a class="btn btn-primary btn-block" href="${safe(whatsappUrl)}" target="_blank" rel="noopener">
-            ${paymentMethod === "whatsapp" ? "Continuar por WhatsApp ↗" : "Enviar comprobante o consultar por WhatsApp ↗"}
+
+          <a
+            class="btn btn-primary btn-block"
+            href="${safe(whatsappUrl)}"
+            target="_blank"
+            rel="noopener">
+            ${paymentMethod === "whatsapp"
+              ? "Continuar por WhatsApp ↗"
+              : "Enviar comprobante o consultar por WhatsApp ↗"}
           </a>
+
           ${
             deliveryMethod === "account"
               ? `<a class="btn btn-outline btn-block" href="account.html">Ir a Mi cuenta</a>`
               : ""
           }
-          <button class="btn btn-soft btn-block" id="finishOrderBtn" type="button">Cerrar</button>
+
+          <button
+            class="btn btn-soft btn-block"
+            id="finishOrderBtn"
+            type="button">
+            Cerrar
+          </button>
+
         </div>
       `;
 
       result.hidden = false;
 
-      $("finishOrderBtn")?.addEventListener(
-        "click",
-        () => openCart(false)
-      );
+      $("finishOrderBtn")?.addEventListener("click", () => {
+        openCart(false);
+      });
 
       toast("Tu pedido quedó registrado correctamente.");
 
@@ -997,31 +1283,24 @@
     }
   }
 
+  // ==========================================
+  // INICIALIZAR CARRITO Y EVENTOS
+  // ==========================================
+
   function initCart() {
-    $("openCartBtn")?.addEventListener(
-      "click",
-      () => openCart(true)
-    );
+    $("openCartBtn")?.addEventListener("click", () => openCart(true));
 
-    $("openCartFloatingBtn")?.addEventListener(
-      "click",
-      () => openCart(true)
-    );
+    $("openCartFloatingBtn")?.addEventListener("click", () => {
+      openCart(true);
+    });
 
-    $("closeCartBtn")?.addEventListener(
-      "click",
-      () => openCart(false)
-    );
+    $("closeCartBtn")?.addEventListener("click", () => openCart(false));
 
-    $("cartBackdrop")?.addEventListener(
-      "click",
-      () => openCart(false)
-    );
+    $("cartBackdrop")?.addEventListener("click", () => {
+      openCart(false);
+    });
 
-    $("checkoutStartBtn")?.addEventListener(
-      "click",
-      showCheckout
-    );
+    $("checkoutStartBtn")?.addEventListener("click", showCheckout);
 
     $("backToCartBtn")?.addEventListener("click", () => {
       $("checkoutView").hidden = true;
@@ -1037,34 +1316,28 @@
       });
     });
 
-    $("checkoutForm")?.addEventListener(
-      "submit",
-      placeOrder
-    );
+    $("checkoutForm")?.addEventListener("submit", placeOrder);
 
-    $("searchInput")?.addEventListener(
-      "input",
-      renderProducts
-    );
+    $("searchInput")?.addEventListener("input", renderProducts);
 
     $("mobileMenuBtn")?.addEventListener("click", () => {
       $("mobileNav")?.classList.toggle("open");
     });
 
-    document.querySelectorAll(
-      'input[name="paymentMethod"]'
-    ).forEach(input => {
+    document.querySelectorAll('input[name="paymentMethod"]').forEach(input => {
       input.addEventListener("change", updatePaymentUI);
     });
 
-    document.querySelectorAll(
-      'input[name="deliveryMethod"]'
-    ).forEach(input => {
+    document.querySelectorAll('input[name="deliveryMethod"]').forEach(input => {
       input.addEventListener("change", updateDeliveryUI);
     });
 
     renderCart();
   }
+
+  // ==========================================
+  // INICIAR TIENDA
+  // ==========================================
 
   async function start() {
     if ($("year")) {
@@ -1083,6 +1356,7 @@
       await loadProducts();
 
       supabase.channel("zero-shop-public-products")
+
         .on(
           "postgres_changes",
           {
@@ -1096,6 +1370,25 @@
             });
           }
         )
+
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "store_settings",
+            filter: "id=eq.1"
+          },
+          () => {
+            loadSettings().catch(error => {
+              console.error(
+                "ZERO-SHOP: no se pudieron actualizar los ajustes",
+                error
+              );
+            });
+          }
+        )
+
         .subscribe();
 
     } catch (error) {
@@ -1111,4 +1404,5 @@
   }
 
   start();
+
 })();
