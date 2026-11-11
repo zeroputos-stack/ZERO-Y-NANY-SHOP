@@ -22,8 +22,7 @@
 
 <main class="admin-page">
 
-  <!-- ACCESO ADMINISTRATIVO -->
-
+  <!-- LOGIN -->
   <section id="loginPanel" class="login-card">
 
     <a class="brand" href="./">
@@ -35,30 +34,18 @@
 
     <h1>Panel administrativo</h1>
 
-    <p>
-      Inicia sesión con una cuenta administradora o editora autorizada de ZERO Y NANY - SHOP.
-    </p>
+    <p>Inicia sesión con una cuenta administradora o editora autorizada de ZERO Y NANY - SHOP.</p>
 
     <form id="loginForm">
 
       <label>
         Correo electrónico
-        <input
-          id="loginEmail"
-          type="email"
-          autocomplete="username"
-          required
-          placeholder="admin@tutienda.com">
+        <input id="loginEmail" type="email" autocomplete="username" required placeholder="admin@tutienda.com">
       </label>
 
       <label>
         Contraseña
-        <input
-          id="loginPassword"
-          type="password"
-          autocomplete="current-password"
-          required
-          placeholder="Tu contraseña">
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Tu contraseña">
       </label>
 
       <button class="btn btn-primary btn-block" id="loginBtn" type="submit">
@@ -78,8 +65,7 @@
   </section>
 
 
-  <!-- CONFIGURACIÓN DE CONTRASEÑA -->
-
+  <!-- CONFIGURAR CONTRASEÑA -->
   <section id="passwordSetupPanel" class="login-card" hidden>
 
     <a class="brand" href="./">
@@ -91,38 +77,21 @@
 
     <h1>Configura tu contraseña</h1>
 
-    <p>
-      Elige una contraseña segura para acceder al panel de la tienda.
-    </p>
+    <p>Elige una contraseña segura para acceder al panel de la tienda.</p>
 
     <form id="setupPasswordForm">
 
       <label>
         Nueva contraseña
-        <input
-          id="newTeamPassword"
-          type="password"
-          autocomplete="new-password"
-          minlength="8"
-          required
-          placeholder="Mínimo 8 caracteres">
+        <input id="newTeamPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Mínimo 8 caracteres">
       </label>
 
       <label>
         Confirmar contraseña
-        <input
-          id="confirmTeamPassword"
-          type="password"
-          autocomplete="new-password"
-          minlength="8"
-          required
-          placeholder="Repite tu contraseña">
+        <input id="confirmTeamPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="Repite tu contraseña">
       </label>
 
-      <button
-        class="btn btn-primary btn-block"
-        id="saveTeamPasswordBtn"
-        type="submit">
+      <button class="btn btn-primary btn-block" id="saveTeamPasswordBtn" type="submit">
         Guardar contraseña
       </button>
 
@@ -134,7 +103,6 @@
 
 
   <!-- APLICACIÓN ADMINISTRATIVA -->
-
   <section id="adminApp" class="admin-app" hidden>
 
     <header class="admin-header">
@@ -145,13 +113,10 @@
       </a>
 
       <div class="admin-user">
-
         <span id="adminEmailLabel"></span>
-
         <button id="logoutBtn" class="btn btn-soft btn-sm">
           Cerrar sesión
         </button>
-
       </div>
 
     </header>
@@ -160,7 +125,6 @@
     <div class="admin-layout">
 
       <!-- MENÚ LATERAL -->
-
       <aside class="admin-sidebar">
 
         <span class="eyebrow">CONTROL CENTER</span>
@@ -196,13 +160,10 @@
       </aside>
 
 
-      <!-- CONTENIDO ADMINISTRATIVO -->
-
       <div class="admin-content">
 
 
         <!-- RESUMEN -->
-
         <section class="admin-tab active" id="tab-dashboard">
 
           <div class="admin-title">
@@ -265,7 +226,6 @@
 
 
         <!-- PRODUCTOS -->
-
         <section class="admin-tab" id="tab-products">
 
           <div class="admin-title">
@@ -277,7 +237,6 @@
             </div>
 
           </div>
-
 
           <div class="admin-columns">
 
@@ -299,20 +258,12 @@
 
               <label>
                 Categoría / plataforma
-                <input
-                  id="productCategory"
-                  required
-                  maxlength="80"
-                  placeholder="Ej. Accesorios">
+                <input id="productCategory" required maxlength="80" placeholder="Ej. Accesorios">
               </label>
 
               <label>
                 Nombre del producto
-                <input
-                  id="productName"
-                  required
-                  maxlength="120"
-                  placeholder="Ej. Producto digital">
+                <input id="productName" required maxlength="120" placeholder="Ej. Producto digital">
               </label>
 
               <div class="two-fields">
@@ -331,11 +282,7 @@
 
               <label>
                 Descripción
-                <textarea
-                  id="productDescription"
-                  rows="2"
-                  maxlength="500"
-                  placeholder="Detalles que verá el cliente"></textarea>
+                <textarea id="productDescription" rows="2" maxlength="500" placeholder="Detalles que verá el cliente"></textarea>
               </label>
 
               <div class="two-fields">
@@ -347,12 +294,7 @@
 
                 <label>
                   Stock
-                  <input
-                    id="productStock"
-                    type="number"
-                    min="0"
-                    step="1"
-                    placeholder="Vacío = por confirmar">
+                  <input id="productStock" type="number" min="0" step="1" placeholder="Vacío = por confirmar">
                 </label>
 
               </div>
@@ -366,10 +308,7 @@
 
                 <label for="productImage">Foto o sticker del producto</label>
 
-                <input
-                  id="productImage"
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,image/gif">
+                <input id="productImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
 
                 <div id="imagePreview" class="image-preview">
                   <span>▧</span>
@@ -377,11 +316,7 @@
                   <small>JPG, PNG, WEBP o GIF · máximo 5 MB</small>
                 </div>
 
-                <button
-                  id="removeImageBtn"
-                  type="button"
-                  class="btn btn-soft btn-sm"
-                  hidden>
+                <button id="removeImageBtn" type="button" class="btn btn-soft btn-sm" hidden>
                   Quitar imagen
                 </button>
 
@@ -403,8 +338,6 @@
 
             </form>
 
-
-            <!-- LISTA DE PRODUCTOS -->
 
             <div class="panel-card product-list-card">
 
@@ -456,7 +389,6 @@
 
 
         <!-- PEDIDOS -->
-
         <section class="admin-tab" id="tab-orders">
 
           <div class="admin-title">
@@ -476,23 +408,19 @@
           <div class="order-filters">
 
             <select id="orderStatusFilter">
-
               <option value="">Todos los estados</option>
               <option value="new">Nuevos</option>
               <option value="confirmed">Confirmados</option>
               <option value="preparing">En preparación</option>
               <option value="completed">Completados</option>
               <option value="cancelled">Cancelados</option>
-
             </select>
 
             <select id="paymentFilter">
-
               <option value="">Todos los pagos</option>
               <option value="pending">Pago pendiente</option>
               <option value="paid">Pagado</option>
               <option value="refunded">Reembolsado</option>
-
             </select>
 
           </div>
@@ -502,8 +430,7 @@
         </section>
 
 
-        <!-- AJUSTES DE LA TIENDA -->
-
+        <!-- AJUSTES -->
         <section class="admin-tab" id="tab-settings">
 
           <div class="admin-title">
@@ -525,11 +452,7 @@
 
             <label>
               WhatsApp de atención (con código de país)
-              <input
-                id="settingWhatsapp"
-                required
-                maxlength="20"
-                placeholder="526623459707">
+              <input id="settingWhatsapp" required maxlength="20" placeholder="526623459707">
             </label>
 
             <label>
@@ -550,16 +473,12 @@
 
           </form>
 
-          <!--
-            EL NUEVO MÓDULO JAVASCRIPT INSERTARÁ AQUÍ
-            EL PANEL DE PAGOS, RECEPCIÓN Y ENTREGA.
-          -->
+          <!-- El módulo admin-payment-delivery.js inserta aquí su panel -->
 
         </section>
 
 
         <!-- USUARIOS Y PERMISOS -->
-
         <section class="admin-tab" id="tab-team">
 
           <div class="feature-banner team-feature-banner">
@@ -571,8 +490,7 @@
               <h1>Usuarios y permisos</h1>
 
               <p>
-                Invita personas, asigna responsabilidades y mantén el control
-                de quién puede administrar ZERO Y NANY - SHOP.
+                Invita personas, asigna responsabilidades y mantén el control de quién puede administrar ZERO Y NANY - SHOP.
               </p>
 
               <div class="feature-pills">
@@ -634,11 +552,7 @@
 
             <label class="team-search">
               <span>⌕</span>
-              <input
-                id="teamSearch"
-                type="search"
-                placeholder="Buscar por correo…"
-                aria-label="Buscar integrante">
+              <input id="teamSearch" type="search" placeholder="Buscar por correo…" aria-label="Buscar integrante">
             </label>
 
             <button id="refreshTeamBtn" class="btn btn-soft">
@@ -650,29 +564,19 @@
 
           <div class="team-grid">
 
-
             <form id="inviteTeamForm" class="panel-card team-invite-card">
 
               <div class="team-card-heading">
-
                 <span class="team-heading-icon">＋</span>
-
                 <div>
                   <h2>Agregar integrante</h2>
                   <p>Envía una invitación para que configure su contraseña.</p>
                 </div>
-
               </div>
 
               <label>
                 Correo electrónico
-                <input
-                  id="teamInviteEmail"
-                  type="email"
-                  required
-                  maxlength="254"
-                  placeholder="persona@correo.com"
-                  autocomplete="off">
+                <input id="teamInviteEmail" type="email" required maxlength="254" placeholder="persona@correo.com" autocomplete="off">
               </label>
 
               <label>
@@ -685,16 +589,13 @@
 
               <div class="role-choice-preview" id="roleChoicePreview">
                 <span class="team-role-pill">EDITOR</span>
-                <p>
-                  Puede editar productos, inventario, imágenes y el diseño de la tienda.
-                </p>
+                <p>Puede editar productos, inventario, imágenes y el diseño de la tienda.</p>
               </div>
 
               <div class="role-explainer">
                 <b>Administrador:</b> gestiona usuarios, ajustes, pedidos, productos y diseño.
                 <br>
-                <b>Editor:</b> gestiona productos, inventario, imágenes y diseño;
-                no administra usuarios, pedidos ni ajustes generales.
+                <b>Editor:</b> gestiona productos, inventario, imágenes y diseño; no administra usuarios, pedidos ni ajustes generales.
               </div>
 
               <button class="btn btn-primary invite-submit" id="inviteTeamBtn" type="submit">
@@ -709,14 +610,11 @@
             <div class="panel-card team-list-card">
 
               <div class="team-card-heading">
-
                 <span class="team-heading-icon team-heading-icon-alt">♙</span>
-
                 <div>
                   <h2>Equipo actual</h2>
                   <p>Actualiza el rol o retira el acceso cuando sea necesario.</p>
                 </div>
-
               </div>
 
               <div id="teamMembersList" class="team-members-list">
@@ -733,7 +631,6 @@
 
 
         <!-- DISEÑADOR VISUAL -->
-
         <section class="admin-tab" id="tab-designer">
 
           <div class="feature-banner designer-feature-banner">
@@ -745,9 +642,7 @@
               <h1>Diseñador de tienda</h1>
 
               <p>
-                Cambia la apariencia de tu tienda desde el celular.
-                Ajusta textos, colores, tipografías, imágenes y organiza
-                las secciones sin entrar al código.
+                Cambia la apariencia de tu tienda desde el celular. Ajusta textos, colores, tipografías, imágenes y organiza las secciones sin entrar al código.
               </p>
 
               <div class="feature-pills">
@@ -768,27 +663,19 @@
 
 
           <div class="designer-benefit-strip">
-
             <div><b>01</b><span>Personaliza la identidad</span></div>
             <div><b>02</b><span>Organiza tu página</span></div>
             <div><b>03</b><span>Guarda y publica</span></div>
-
           </div>
 
 
           <div class="designer-mode-switch" role="tablist" aria-label="Tipo de editor">
 
-            <button
-              type="button"
-              class="designer-mode active"
-              data-designer-mode="visual">
+            <button type="button" class="designer-mode active" data-designer-mode="visual">
               ✎ Editor visual
             </button>
 
-            <button
-              type="button"
-              class="designer-mode"
-              data-designer-mode="layout">
+            <button type="button" class="designer-mode" data-designer-mode="layout">
               ⠿ Arrastrar y ordenar
             </button>
 
@@ -799,16 +686,13 @@
 
             <form id="designerForm" class="designer-grid">
 
-
               <div class="panel-card designer-controls">
 
                 <div class="panel-card-head">
-
                   <div>
                     <h2>Identidad y textos</h2>
                     <p>Actualiza lo que ven tus clientes.</p>
                   </div>
-
                 </div>
 
                 <label>
@@ -833,16 +717,12 @@
 
                 <label>
                   Imagen principal (JPG, PNG o WEBP)
-                  <input
-                    id="designHeroImage"
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp">
+                  <input id="designHeroImage" type="file" accept="image/jpeg,image/png,image/webp">
                 </label>
 
                 <div id="designImagePreview" class="designer-image-preview">
                   Imagen principal actual
                 </div>
-
 
                 <div class="designer-color-grid">
 
@@ -868,33 +748,23 @@
 
                 </div>
 
-
                 <label>
                   Tipografía
-
                   <select id="designFont">
                     <option value="Inter">Inter</option>
                     <option value="Poppins">Poppins</option>
                     <option value="system">Sistema</option>
                     <option value="Arial">Arial</option>
                   </select>
-
                 </label>
-
 
                 <div class="form-actions">
 
-                  <button
-                    class="btn btn-primary"
-                    type="submit"
-                    id="saveDesignBtn">
+                  <button class="btn btn-primary" type="submit" id="saveDesignBtn">
                     Guardar diseño
                   </button>
 
-                  <button
-                    class="btn btn-soft"
-                    type="button"
-                    id="resetDesignBtn">
+                  <button class="btn btn-soft" type="button" id="resetDesignBtn">
                     Restaurar valores
                   </button>
 
@@ -905,14 +775,11 @@
               </div>
 
 
-              <!-- VISTA PREVIA -->
-
               <div class="designer-preview-column">
 
                 <div class="panel-card designer-preview-card">
 
                   <div class="panel-card-head">
-
                     <div>
                       <h2>Vista previa en vivo</h2>
                       <p>Así se verá el encabezado de tu tienda.</p>
@@ -921,9 +788,7 @@
                     <span class="preview-dot" id="designerSaveState">
                       ● SIN CAMBIOS
                     </span>
-
                   </div>
-
 
                   <div id="designerLivePreview" class="designer-live-preview">
 
@@ -931,11 +796,7 @@
                       ♛ <b id="previewBrandName">ZERO Y NANY - SHOP</b>
                     </div>
 
-                    <img
-                      id="previewHeroImage"
-                      class="preview-hero-image"
-                      alt="Vista previa de la portada"
-                      hidden>
+                    <img id="previewHeroImage" class="preview-hero-image" alt="Vista previa de la portada" hidden>
 
                     <span id="previewBadge">
                       TIENDA DIGITAL · ZERO Y NANY - SHOP
@@ -961,8 +822,7 @@
                 <div class="panel-card designer-note">
                   <b>Consejo</b>
                   <p>
-                    Los cambios se guardan en Supabase y aparecen en la tienda pública.
-                    El editor no modifica precios, productos ni pedidos.
+                    Los cambios se guardan en Supabase y aparecen en la tienda pública. El editor no modifica precios, productos ni pedidos.
                   </p>
                 </div>
 
@@ -973,8 +833,6 @@
           </section>
 
 
-          <!-- ORGANIZACIÓN DE SECCIONES -->
-
           <section id="designerLayoutMode" class="designer-mode-panel" hidden>
 
             <div class="panel-card layout-editor-card">
@@ -983,20 +841,14 @@
 
                 <div>
                   <h2>Orden y visibilidad de secciones</h2>
-                  <p>
-                    Arrastra las secciones para reordenarlas o usa las flechas en el celular.
-                  </p>
+                  <p>Arrastra las secciones para reordenarlas o usa las flechas en el celular.</p>
                 </div>
 
-                <button
-                  type="button"
-                  class="btn btn-primary btn-sm"
-                  id="saveLayoutBtn">
+                <button type="button" class="btn btn-primary btn-sm" id="saveLayoutBtn">
                   Guardar distribución
                 </button>
 
               </div>
-
 
               <div id="designerSectionList" class="designer-section-list">
 
@@ -1052,17 +904,10 @@
 
 
 <!-- NOTIFICACIONES -->
-
-<div
-  id="adminToast"
-  class="toast"
-  role="status"
-  aria-live="polite">
-</div>
+<div id="adminToast" class="toast" role="status" aria-live="polite"></div>
 
 
-<!-- LIBRERÍAS Y ARCHIVOS JAVASCRIPT -->
-
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script src="config.js"></script>
@@ -1070,8 +915,6 @@
 <script src="js/supabase-client.js"></script>
 
 <script src="js/admin.js"></script>
-
-<!-- NUEVO MÓDULO: PAGOS, RECEPCIÓN Y ENTREGA -->
 
 <script src="js/admin-payment-delivery.js"></script>
 
