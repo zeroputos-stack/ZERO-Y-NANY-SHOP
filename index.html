@@ -1,29 +1,241 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#090812">
-  <meta name="description" content="ZERO Y NANY - SHOP: tienda digital, catálogo y pedidos.">
-  <title>ZERO Y NANY - SHOP | Tienda oficial</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100b1c">
+  <meta name="description" content="ZERO Y NANY SHOP - Tienda digital, catálogo y pedidos.">
+
+  <title>ZERO Y NANY - SHOP</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="styles.css">
+
+  <!-- DISEÑO PREMIUM DEL MENÚ -->
+  <style>
+    .mobile-nav {
+      display: none;
+      padding: 22px 18px;
+      background: rgba(12, 8, 22, .97);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-top: 1px solid rgba(255,255,255,.09);
+    }
+
+    .mobile-nav.open {
+      display: block;
+      animation: menuAppear .3s ease;
+    }
+
+    @keyframes menuAppear {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .mobile-nav-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 17px;
+      color: #c7b4d6;
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .nav-online {
+      color: #55e4b2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 1px;
+    }
+
+    .nav-online i {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #55e4b2;
+      box-shadow: 0 0 12px #55e4b2;
+    }
+
+    .mobile-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .mobile-nav-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      min-height: 88px;
+      padding: 13px 10px;
+      border-radius: 17px;
+      border: 1px solid rgba(255,255,255,.09);
+      background: linear-gradient(
+        145deg,
+        rgba(255,255,255,.085),
+        rgba(255,255,255,.025)
+      );
+      color: #fff;
+      text-decoration: none;
+      transition: .25s ease;
+      overflow: hidden;
+    }
+
+    .mobile-nav-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(237,74,154,.5);
+      box-shadow: 0 10px 25px rgba(237,54,139,.12);
+    }
+
+    .mobile-nav-card:active {
+      transform: scale(.96);
+    }
+
+    .nav-icon {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+    }
+
+    .nav-icon svg {
+      width: 21px;
+      height: 21px;
+      stroke-width: 2;
+    }
+
+    .nav-icon.pink {
+      background: linear-gradient(135deg,#fa367b,#b51e7a);
+      color: white;
+      box-shadow: 0 5px 18px #f02c7935;
+    }
+
+    .nav-icon.purple {
+      background: linear-gradient(135deg,#a64bff,#6127ba);
+      color: white;
+      box-shadow: 0 5px 18px #9138ff35;
+    }
+
+    .nav-icon.orange {
+      background: linear-gradient(135deg,#ff9a3c,#ed426b);
+      color: white;
+    }
+
+    .mobile-nav-info {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+    }
+
+    .mobile-nav-info strong {
+      font-size: 12px;
+      line-height: 1.25;
+      font-weight: 800;
+      color: white;
+    }
+
+    .mobile-nav-info small {
+      color: #bcaecb;
+      font-size: 10px;
+      line-height: 1.3;
+    }
+
+    .nav-arrow {
+      width: 14px;
+      height: 14px;
+      color: #9b82ad;
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+
+    .admin-card {
+      grid-column: 1 / -1;
+      min-height: 76px;
+      border-color: rgba(255,142,91,.22);
+      background: linear-gradient(
+        110deg,
+        rgba(255,112,100,.12),
+        rgba(255,255,255,.025)
+      );
+    }
+
+    .mobile-nav-footer {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      padding-top: 21px;
+      margin-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      color: #9885a9;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .mobile-nav-footer svg {
+      width: 15px;
+      height: 15px;
+      color: #ef69a6;
+    }
+
+    @media (min-width: 901px) {
+      .mobile-nav {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .mobile-nav-card {
+        gap: 7px;
+        padding: 10px 7px;
+      }
+
+      .nav-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .mobile-nav-info strong {
+        font-size: 11px;
+      }
+    }
+  </style>
 </head>
 
 <body>
+
   <div class="top-glow"></div>
 
+  <!-- ENCABEZADO -->
   <header class="site-header">
+
     <div class="container nav">
 
       <a class="brand" href="./" aria-label="ZERO-SHOP inicio">
         <span class="brand-crown">♛</span>
-        <span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span>
+        <span class="brand-name" data-store-name>
+          ZERO Y NANY - SHOP
+        </span>
       </a>
 
       <nav class="nav-links">
@@ -33,6 +245,7 @@
       </nav>
 
       <div class="nav-actions">
+
         <a class="btn btn-soft account-link" href="account.html">
           Mi cuenta
         </a>
@@ -45,94 +258,124 @@
           <span>Mi carrito</span>
           <b id="cartCount">0</b>
         </button>
+
       </div>
 
-      <button class="mobile-menu" id="mobileMenuBtn" aria-label="Abrir menú">
+      <button
+        class="mobile-menu"
+        id="mobileMenuBtn"
+        type="button"
+        aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobileNav"
+      >
         ☰
       </button>
 
     </div>
 
-<div class="mobile-nav" id="mobileNav">
-  <div class="mobile-nav-heading">
-    <span>EXPLORA ZERO-SHOP</span>
-    <span class="nav-online"><i></i> EN LÍNEA</span>
-  </div>
+    <!-- MENÚ PREMIUM PARA CELULAR -->
+    <div class="mobile-nav" id="mobileNav">
 
-  <div class="mobile-nav-grid">
+      <div class="mobile-nav-heading">
+        <span>EXPLORA ZERO-SHOP</span>
+        <span class="nav-online">
+          <i></i> EN LÍNEA
+        </span>
+      </div>
 
-    <a href="#catalogo" class="mobile-nav-card">
-      <span class="nav-icon pink">
-        <i data-lucide="shopping-bag"></i>
-      </span>
-      <span class="mobile-nav-info">
-        <strong>Catálogo</strong>
-        <small>Explora productos</small>
-      </span>
-      <i data-lucide="chevron-right" class="nav-arrow"></i>
-    </a>
+      <div class="mobile-nav-grid">
 
-    <a href="#como-comprar" class="mobile-nav-card">
-      <span class="nav-icon purple">
-        <i data-lucide="receipt-text"></i>
-      </span>
-      <span class="mobile-nav-info">
-        <strong>Cómo comprar</strong>
-        <small>Guía de compra</small>
-      </span>
-      <i data-lucide="chevron-right" class="nav-arrow"></i>
-    </a>
+        <a href="#catalogo" class="mobile-nav-card">
+          <span class="nav-icon pink">
+            <i data-lucide="shopping-bag"></i>
+          </span>
 
-    <a href="#contacto" class="mobile-nav-card">
-      <span class="nav-icon pink">
-        <i data-lucide="messages-square"></i>
-      </span>
-      <span class="mobile-nav-info">
-        <strong>Contacto</strong>
-        <small>Atención y soporte</small>
-      </span>
-      <i data-lucide="chevron-right" class="nav-arrow"></i>
-    </a>
+          <span class="mobile-nav-info">
+            <strong>Catálogo</strong>
+            <small>Explora productos</small>
+          </span>
 
-    <a href="account.html" class="mobile-nav-card">
-      <span class="nav-icon purple">
-        <i data-lucide="user-round"></i>
-      </span>
-      <span class="mobile-nav-info">
-        <strong>Mi cuenta</strong>
-        <small>Registro y pedidos</small>
-      </span>
-      <i data-lucide="chevron-right" class="nav-arrow"></i>
-    </a>
+          <i data-lucide="chevron-right" class="nav-arrow"></i>
+        </a>
 
-    <a href="admin.html" class="mobile-nav-card admin-card">
-      <span class="nav-icon orange">
-        <i data-lucide="shield-check"></i>
-      </span>
-      <span class="mobile-nav-info">
-        <strong>Panel administrativo</strong>
-        <small>Control y gestión de la tienda</small>
-      </span>
-      <i data-lucide="chevron-right" class="nav-arrow"></i>
-    </a>
+        <a href="#como-comprar" class="mobile-nav-card">
+          <span class="nav-icon purple">
+            <i data-lucide="receipt-text"></i>
+          </span>
 
-  </div>
+          <span class="mobile-nav-info">
+            <strong>Cómo comprar</strong>
+            <small>Guía de compra</small>
+          </span>
 
-  <div class="mobile-nav-footer">
-    <i data-lucide="crown"></i>
-    ZERO Y NANY · SHOP
-  </div>
-</div>
+          <i data-lucide="chevron-right" class="nav-arrow"></i>
+        </a>
+
+        <a href="#contacto" class="mobile-nav-card">
+          <span class="nav-icon pink">
+            <i data-lucide="messages-square"></i>
+          </span>
+
+          <span class="mobile-nav-info">
+            <strong>Contacto</strong>
+            <small>Atención y soporte</small>
+          </span>
+
+          <i data-lucide="chevron-right" class="nav-arrow"></i>
+        </a>
+
+        <a href="account.html" class="mobile-nav-card account-link">
+          <span class="nav-icon purple">
+            <i data-lucide="user-round"></i>
+          </span>
+
+          <span class="mobile-nav-info">
+            <strong>Mi cuenta</strong>
+            <small>Registro y pedidos</small>
+          </span>
+
+          <i data-lucide="chevron-right" class="nav-arrow"></i>
+        </a>
+
+        <a href="admin.html" class="mobile-nav-card admin-card">
+          <span class="nav-icon orange">
+            <i data-lucide="shield-check"></i>
+          </span>
+
+          <span class="mobile-nav-info">
+            <strong>Panel administrativo</strong>
+            <small>Control y gestión de la tienda</small>
+          </span>
+
+          <i data-lucide="chevron-right" class="nav-arrow"></i>
+        </a>
+
+      </div>
+
+      <div class="mobile-nav-footer">
+        <i data-lucide="crown"></i>
+        ZERO Y NANY · SHOP
+      </div>
+
+    </div>
+
   </header>
 
   <main>
 
-    <section class="hero container" id="inicio" data-design-section="hero">
+    <!-- PORTADA -->
+    <section
+      class="hero container"
+      id="inicio"
+      data-design-section="hero"
+    >
 
       <div class="hero-copy">
 
         <span class="eyebrow" id="heroBadge">
-          <i></i> TIENDA DIGITAL · ZERO Y NANY - SHOP
+          <i></i>
+          TIENDA DIGITAL · ZERO Y NANY - SHOP
         </span>
 
         <h1 id="heroTitle">
@@ -144,17 +387,26 @@
         </p>
 
         <div class="hero-actions">
+
           <a class="btn btn-primary btn-large" href="#catalogo">
             <span id="heroCtaLabel">Explorar catálogo</span>
             <span>↗</span>
           </a>
 
-          <a class="btn btn-outline btn-large" id="heroWhatsapp" href="#" target="_blank" rel="noopener">
+          <a
+            class="btn btn-outline btn-large"
+            id="heroWhatsapp"
+            href="#"
+            target="_blank"
+            rel="noopener"
+          >
             Hablar por WhatsApp
           </a>
+
         </div>
 
         <div class="hero-stats">
+
           <div>
             <strong id="heroProductCount">—</strong>
             <span>opciones en catálogo</span>
@@ -169,6 +421,7 @@
             <strong>En línea</strong>
             <span>catálogo sincronizado</span>
           </div>
+
         </div>
 
       </div>
@@ -178,7 +431,7 @@
         <img
           id="heroImage"
           src="assets/zero-shop-hero.png"
-          alt="Imagen principal de ZERO Y NANY - SHOP"
+          alt="ZERO Y NANY SHOP"
           onerror="this.style.display='none'"
         >
 
@@ -194,9 +447,15 @@
         </div>
 
       </div>
+
     </section>
 
-    <section class="container catalog-section" id="catalogo" data-design-section="catalogo">
+    <!-- CATÁLOGO -->
+    <section
+      class="container catalog-section"
+      id="catalogo"
+      data-design-section="catalogo"
+    >
 
       <div class="section-heading">
 
@@ -207,7 +466,8 @@
         </div>
 
         <div class="live-indicator">
-          <span></span> Actualización en vivo
+          <span></span>
+          Actualización en vivo
         </div>
 
       </div>
@@ -216,22 +476,43 @@
 
         <label class="search">
           <span>⌕</span>
-          <input id="searchInput" type="search" placeholder="Buscar en ZERO-SHOP…">
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Buscar en ZERO-SHOP…"
+          >
         </label>
 
-        <div id="categoryFilters" class="category-filters"></div>
+        <div
+          id="categoryFilters"
+          class="category-filters"
+        ></div>
 
       </div>
 
-      <div id="storeStatus" class="status-banner" hidden></div>
+      <div
+        id="storeStatus"
+        class="status-banner"
+        hidden
+      ></div>
 
-      <div id="productGrid" class="product-grid">
-        <div class="loading-card">Conectando con ZERO-SHOP…</div>
+      <div
+        id="productGrid"
+        class="product-grid"
+      >
+        <div class="loading-card">
+          Conectando con ZERO-SHOP…
+        </div>
       </div>
 
     </section>
 
-    <section class="container how-section" id="como-comprar" data-design-section="como-comprar">
+    <!-- CÓMO COMPRAR -->
+    <section
+      class="container how-section"
+      id="como-comprar"
+      data-design-section="como-comprar"
+    >
 
       <div class="section-heading">
         <div>
@@ -268,15 +549,29 @@
 
     </section>
 
-    <section class="container contact-section" id="contacto" data-design-section="contacto">
+    <!-- CONTACTO -->
+    <section
+      class="container contact-section"
+      id="contacto"
+      data-design-section="contacto"
+    >
 
       <div>
         <span class="eyebrow">¿NECESITAS AYUDA?</span>
         <h2>Estamos para atenderte.</h2>
-        <p>Si tienes dudas sobre un producto o tu pedido, ponte en contacto con la tienda.</p>
+        <p>
+          Si tienes dudas sobre un producto o tu pedido,
+          ponte en contacto con la tienda.
+        </p>
       </div>
 
-      <a id="contactWhatsapp" class="btn btn-primary btn-large" href="#" target="_blank" rel="noopener">
+      <a
+        id="contactWhatsapp"
+        class="btn btn-primary btn-large"
+        href="#"
+        target="_blank"
+        rel="noopener"
+      >
         Contactar por WhatsApp ↗
       </a>
 
@@ -284,85 +579,195 @@
 
   </main>
 
+  <!-- PIE DE PÁGINA -->
   <footer class="site-footer">
 
     <div class="container footer-inner">
 
       <a class="brand" href="./">
         <span class="brand-crown">♛</span>
-        <span class="brand-name" data-store-name>ZERO Y NANY - SHOP</span>
+        <span class="brand-name" data-store-name>
+          ZERO Y NANY - SHOP
+        </span>
       </a>
 
       <span>
         © <span id="year"></span>
-        <span data-store-name>ZERO Y NANY - SHOP</span>. Catálogo digital.
+        <span data-store-name>ZERO Y NANY - SHOP</span>.
+        Catálogo digital.
       </span>
 
-      <a href="admin.html">Acceso administrativo</a>
+      <a href="admin.html">
+        Acceso administrativo
+      </a>
 
     </div>
 
   </footer>
 
-  <button class="cart-backdrop" id="cartBackdrop" aria-label="Cerrar carrito"></button>
+  <!-- FONDO DEL CARRITO -->
+  <button
+    class="cart-backdrop"
+    id="cartBackdrop"
+    type="button"
+    aria-label="Cerrar carrito"
+  ></button>
 
-  <aside class="cart-drawer" id="cartDrawer" aria-label="Carrito de compras">
+  <!-- CARRITO -->
+  <aside
+    class="cart-drawer"
+    id="cartDrawer"
+    aria-label="Carrito de compras"
+  >
 
     <div class="drawer-head">
+
       <div>
         <span class="eyebrow">TU COMPRA</span>
         <h2>Mi carrito</h2>
       </div>
 
-      <button id="closeCartBtn" class="icon-btn" aria-label="Cerrar">
+      <button
+        id="closeCartBtn"
+        class="icon-btn"
+        type="button"
+        aria-label="Cerrar"
+      >
         ×
       </button>
+
     </div>
 
-    <div id="cartItems" class="cart-items"></div>
+    <div
+      id="cartItems"
+      class="cart-items"
+    ></div>
 
     <div class="cart-summary">
       <span>Total estimado</span>
       <strong id="cartTotal">$0.00</strong>
     </div>
 
-    <form id="checkoutForm" class="checkout-form">
+    <!-- FORMULARIO DE PEDIDO -->
+    <form
+      id="checkoutForm"
+      class="checkout-form"
+    >
 
       <h3>Datos para tu pedido</h3>
 
       <label>
         Nombre
-        <input id="customerName" required minlength="2" maxlength="100" placeholder="Tu nombre">
+        <input
+          id="customerName"
+          required
+          minlength="2"
+          maxlength="100"
+          placeholder="Tu nombre"
+        >
       </label>
 
       <label>
         WhatsApp
-        <input id="customerWhatsapp" required inputmode="tel" minlength="8" maxlength="20" placeholder="Número con lada">
+        <input
+          id="customerWhatsapp"
+          required
+          inputmode="tel"
+          minlength="8"
+          maxlength="20"
+          placeholder="Número con lada"
+        >
       </label>
 
       <label>
         Notas (opcional)
-        <textarea id="customerNotes" maxlength="500" rows="2" placeholder="Detalles de tu pedido"></textarea>
+        <textarea
+          id="customerNotes"
+          maxlength="500"
+          rows="2"
+          placeholder="Detalles de tu pedido"
+        ></textarea>
       </label>
 
-      <button class="btn btn-primary btn-block" id="placeOrderBtn" type="submit">
+      <button
+        class="btn btn-primary btn-block"
+        id="placeOrderBtn"
+        type="submit"
+      >
         Enviar pedido
       </button>
 
-      <small>El inventario se valida al confirmar el pedido.</small>
+      <small>
+        El inventario se valida al confirmar el pedido.
+      </small>
 
     </form>
 
-    <div id="checkoutResult" class="checkout-result" hidden></div>
+    <div
+      id="checkoutResult"
+      class="checkout-result"
+      hidden
+    ></div>
 
   </aside>
 
-  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- NOTIFICACIONES -->
+  <div
+    class="toast"
+    id="toast"
+    role="status"
+    aria-live="polite"
+  ></div>
 
+  <!-- CONEXIÓN SUPABASE -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="config.js"></script>
+
   <script src="js/supabase-client.js"></script>
+
+  <!-- FUNCIONES DE LA TIENDA -->
   <script src="js/store.js"></script>
+
+  <!-- ICONOS PREMIUM -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    if (window.lucide) {
+      window.lucide.createIcons();
+    }
+
+    document.getElementById("year").textContent =
+      new Date().getFullYear();
+
+    // ACCESIBILIDAD DEL MENÚ
+    const menuButton = document.getElementById("mobileMenuBtn");
+    const mobileNav = document.getElementById("mobileNav");
+
+    if (menuButton && mobileNav) {
+      const observer = new MutationObserver(() => {
+        menuButton.setAttribute(
+          "aria-expanded",
+          mobileNav.classList.contains("open") ? "true" : "false"
+        );
+      });
+
+      observer.observe(mobileNav, {
+        attributes: true,
+        attributeFilter: ["class"]
+      });
+    }
+
+    // Cerrar menú al seleccionar una sección
+    if (mobileNav) {
+      mobileNav.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener("click", () => {
+          mobileNav.classList.remove("open");
+          menuButton?.setAttribute("aria-expanded", "false");
+        });
+      });
+    }
+  </script>
 
 </body>
 </html>
