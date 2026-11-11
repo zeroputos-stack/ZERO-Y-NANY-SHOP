@@ -169,3 +169,90 @@
   .designer-section-row{grid-template-columns:auto minmax(0,1fr) auto auto auto;gap:5px;padding:9px}.designer-section-row b{font-size:9px}.designer-section-row label{font-size:8px}.designer-section-row .btn{min-width:29px;min-height:32px;padding:6px 7px}
 }
 @media(max-width:390px){.feature-banner-art{display:none}.team-stat-card{padding:9px 7px}.team-stat-icon{display:none}.team-stat-card strong{font-size:19px}.team-stat-card small{font-size:7px}.designer-benefit-strip span{font-size:7px}}
+
+/* ===== MENÚ MÓVIL TIPO ICONOS ===== */
+.mobile-nav{
+  display:none;
+  padding:18px;
+  border-top:1px solid rgba(255,255,255,.08);
+  background:rgba(7,6,18,.98);
+  backdrop-filter:blur(14px);
+}
+
+.mobile-nav.open{
+  display:block;
+}
+
+.mobile-nav-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.mobile-nav-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+  color:#f4efff;
+  background:linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:18px;
+  padding:14px 12px;
+  min-height:82px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18);
+  transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.mobile-nav-card:hover,
+.mobile-nav-card:active{
+  transform:translateY(-2px);
+  border-color:rgba(255,80,140,.45);
+  box-shadow:0 14px 36px rgba(255,40,120,.16);
+}
+
+.mobile-nav-icon{
+  width:48px;
+  height:48px;
+  min-width:48px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  font-size:22px;
+  background:linear-gradient(135deg,#ff2f72,#7d35ff);
+  box-shadow:0 8px 24px rgba(255,60,130,.28);
+}
+
+.mobile-nav-info{
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+
+.mobile-nav-info strong{
+  font-size:15px;
+  line-height:1.2;
+  color:#ffffff;
+}
+
+.mobile-nav-info small{
+  font-size:12px;
+  color:#c9bfdc;
+  margin-top:4px;
+  line-height:1.25;
+}
+
+.admin-card{
+  grid-column:1 / -1;
+}
+
+.admin-card .mobile-nav-icon{
+  background:linear-gradient(135deg,#ff8a00,#ff3d6e);
+}
+
+@media (min-width: 901px){
+  .mobile-nav{
+    display:none !important;
+  }
+}
