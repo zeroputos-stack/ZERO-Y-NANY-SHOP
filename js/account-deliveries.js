@@ -5,458 +5,724 @@
   const db = window.zeroSupabase;
   const $ = id => document.getElementById(id);
 
-  if (!db) return;
+  if (!db) {
+    console.error("ZERO-SHOP: Supabase no está conectado.");
+    return;
+  }
 
-  let userId = null;
-  let refreshTimer = null;
+  let currentUserId = null;
   let loading = false;
 
-  const esc = value => String(value ?? "").replace(/[&<>"']/g, c => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[c]));
+  // ==========================================
+  // FUNCIONES GENERALES
+  // ==========================================
 
-  const formatDate = value => value
+  const escapeHTML = value =>
+    String(value ?? "").replace(/[&<>"']/g, c => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[c]));
+
+  const money = value => new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN"
+  }).format(Number(value || 0));
+
+  const dateTime = value => value
     ? new Date(value).toLocaleString("es-MX", {
         dateStyle: "medium",
         timeStyle: "short"
       })
     : "Fecha no disponible";
 
+  // ==========================================
+  // ESTILOS
+  // ==========================================
+
   function addStyles() {
-    if ($("zeroShopNotificationStyles")) return;
+    if ($("myDigitalDeliveriesStyles")) return;
 
     const style = document.createElement("style");
-    style.id = "zeroShopNotificationStyles";
+    style.id = "myDigitalDeliveriesStyles";
 
     style.textContent = `
-      .zsn-button {
-        position:relative;
-        border:1px solid #ffffff25;
-        background:#ffffff0a;
-        color:white;
-        border-radius:12px;
-        padding:10px 13px;
-        font:800 12px Inter,sans-serif;
-        cursor:pointer;
+      .my-deliveries-panel {
+        margin-top: 25px;
+        padding: 20px;
+        border: 1px solid #ffffff20;
+        border-radius: 20px;
+        background: linear-gradient(145deg,#171526,#10101b);
+        color: white;
       }
 
-      .zsn-count {
-        display:inline-grid;
-        place-items:center;
-        min-width:19px;
-        height:19px;
-        margin-left:5px;
-        padding:0 5px;
-        border-radius:99px;
-        background:#ff315d;
-        color:white;
-        font-size:10px;
-        font-weight:900;
+      .my-deliveries-panel h3 {
+        margin: 0 0 8px;
+        font-size: 20px;
       }
 
-      .zsn-count[hidden] {
-        display:none!important;
+      .my-deliveries-description {
+        color: #aaa6bf;
+        font-size: 12px;
+        line-height: 1.6;
+        margin-bottom: 18px;
       }
 
-      .zsn-panel {
-        border:1px solid #ffffff18;
-        border-radius:20px;
-        background:linear-gradient(145deg,#171526,#10101b);
-        padding:18px;
-        margin:14px 0;
-        box-shadow:0 18px 55px #0004;
+      .my-delivery-order {
+        border: 1px solid #ffffff18;
+        background: #11101d;
+        border-radius: 15px;
+        padding: 15px;
+        margin: 13px 0;
       }
 
-      .zsn-panel[hidden] {
-        display:none!important;
+      .my-delivery-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 10px;
       }
 
-      .zsn-head {
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        gap:10px;
-        flex-wrap:wrap;
-        margin-bottom:14px;
+      .my-delivery-head strong {
+        font-size: 13px;
+        color: white;
       }
 
-      .zsn-head h3 {
-        margin:0;
-        font-size:17px;
-        color:white;
+      .my-delivery-pill {
+        font-size: 10px;
+        font-weight: 800;
+        border-radius: 99px;
+        padding: 6px 9px;
+        background: #ffb02018;
+        color: #ffd38a;
+        border: 1px solid #ffb02044;
       }
 
-      .zsn-actions {
-        display:flex;
-        gap:8px;
-        flex-wrap:wrap;
+      .my-delivery-pill.done {
+        background: #19c37d18;
+        color: #8ce8b7;
+        border-color: #19c37d44;
       }
 
-      .zsn-small {
-        border:1px solid #ffffff20;
-        background:#ffffff08;
-        color:#ff9bb4;
-        border-radius:9px;
-        padding:8px 10px;
-        font:750 11px Inter,sans-serif;
-        cursor:pointer;
+      .my-delivery-product {
+        border-top: 1px solid #ffffff12;
+        padding: 13px 0;
       }
 
-      .zsn-list {
-        display:grid;
-        gap:10px;
+      .my-delivery-product strong {
+        display: block;
+        font-size: 13px;
+        color: white;
       }
 
-      .zsn-item {
-        display:grid;
-        grid-template-columns:38px 1fr;
-        gap:10px;
-        padding:13px;
-        border:1px solid #ffffff15;
-        border-radius:13px;
-        background:#09081280;
+      .my-delivery-product small {
+        display: block;
+        color: #aaa6bf;
+        font-size: 11px;
+        margin-top: 5px;
       }
 
-      .zsn-item.unread {
-        border-color:#ff719655;
-        background:#ff315d0b;
+      .my-delivery-content {
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        background: #090812;
+        border: 1px solid #ff719655;
+        border-radius: 11px;
+        padding: 13px;
+        margin-top: 10px;
+        color: #f8eaf0;
+        font-size: 13px;
+        line-height: 1.7;
       }
 
-      .zsn-icon {
-        width:36px;
-        height:36px;
-        border-radius:11px;
-        display:grid;
-        place-items:center;
-        background:#ff315d1c;
-        color:#ff91ad;
-        font-size:17px;
+      .my-delivery-copy {
+        margin-top: 9px;
+        border: 1px solid #ffffff22;
+        background: #ffffff0a;
+        color: #ff9bb4;
+        border-radius: 9px;
+        padding: 9px 12px;
+        font: 800 11px Inter,sans-serif;
+        cursor: pointer;
       }
 
-      .zsn-copy strong {
-        display:block;
-        color:white;
-        font-size:12px;
+      .my-delivery-copy:hover {
+        background: #ff315d20;
       }
 
-      .zsn-copy p {
-        margin:5px 0;
-        color:#bcb8ce;
-        font-size:11px;
-        line-height:1.55;
+      .my-delivery-pending {
+        font-size: 11px;
+        color: #b7b1c9;
+        margin-top: 9px;
+        line-height: 1.6;
       }
 
-      .zsn-copy small {
-        color:#827d96;
-        font-size:10px;
+      .my-delivery-meta {
+        color: #aaa6bf;
+        font-size: 11px;
+        margin: 8px 0 12px;
       }
 
-      .zsn-open {
-        display:inline-block;
-        margin-top:8px;
-        border:0;
-        background:none;
-        padding:0;
-        color:#ff91ad;
-        font:800 11px Inter,sans-serif;
-        cursor:pointer;
+      .my-delivery-method {
+        display: inline-block;
+        font-size: 10px;
+        color: #ff9bb4;
+        border: 1px solid #ff719633;
+        border-radius: 20px;
+        padding: 5px 8px;
+        margin-top: 8px;
       }
 
-      .zsn-empty {
-        padding:22px;
-        text-align:center;
-        color:#a9a5bb;
-        font-size:12px;
-        border:1px dashed #ffffff25;
-        border-radius:13px;
+      .my-delivery-empty {
+        padding: 22px;
+        text-align: center;
+        color: #aaa6bf;
+        font-size: 12px;
+        line-height: 1.7;
+        border: 1px dashed #ffffff25;
+        border-radius: 13px;
+      }
+
+      @media(max-width:600px) {
+        .my-deliveries-panel {
+          padding: 15px;
+        }
+
+        .my-delivery-order {
+          padding: 12px;
+        }
       }
     `;
 
     document.head.appendChild(style);
   }
 
-  function ensureUI() {
+  // ==========================================
+  // CREAR PANEL EN ACCOUNT.HTML
+  // ==========================================
+
+  function ensurePanel() {
     addStyles();
 
-    const head = document.querySelector(
-      "#accountView .account-dashboard-head"
-    );
+    const dashboard = $("dashboard");
+    const ordersList = $("ordersList");
 
-    if (!head) return;
-
-    const actions = head.querySelector("div:last-child");
-
-    if (actions && !$("zeroShopNotificationButton")) {
-      const button = document.createElement("button");
-
-      button.type = "button";
-      button.id = "zeroShopNotificationButton";
-      button.className = "zsn-button";
-
-      button.innerHTML = `
-        ♧ Notificaciones
-        <span class="zsn-count" id="zeroShopUnreadCount" hidden>0</span>
-      `;
-
-      actions.insertBefore(button, actions.firstChild);
-
-      button.addEventListener("click", togglePanel);
+    if (!dashboard || !ordersList) {
+      console.warn(
+        "ZERO-SHOP: No se encontró el panel del cliente."
+      );
+      return null;
     }
 
-    if (!$("zeroShopNotificationsPanel")) {
-      const panel = document.createElement("section");
+    let panel = $("myDigitalDeliveries");
 
-      panel.id = "zeroShopNotificationsPanel";
-      panel.className = "zsn-panel";
-      panel.hidden = true;
+    if (panel) return panel;
 
-      panel.innerHTML = `
-        <div class="zsn-head">
-          <h3>Centro de notificaciones</h3>
+    panel = document.createElement("section");
 
-          <div class="zsn-actions">
-            <button type="button"
-              class="zsn-small"
-              id="zeroShopMarkAllRead">
-              Marcar todas como leídas
-            </button>
+    panel.id = "myDigitalDeliveries";
+    panel.className = "my-deliveries-panel";
 
-            <button type="button"
-              class="zsn-small"
-              id="zeroShopRefreshNotifications">
-              ↻ Actualizar
-            </button>
-          </div>
+    panel.innerHTML = `
+      <h3>📦 Mis productos digitales</h3>
+
+      <p class="my-deliveries-description">
+        Aquí puedes consultar todos los productos que ZERO-SHOP
+        te ha entregado, incluyendo códigos, enlaces,
+        contraseñas e instrucciones.
+      </p>
+
+      <div id="myDigitalDeliveriesList">
+        <div class="my-delivery-empty">
+          Consultando tus productos...
         </div>
+      </div>
+    `;
 
-        <div id="zeroShopNotificationsList" class="zsn-list">
-          <div class="zsn-empty">
-            Cargando notificaciones…
-          </div>
-        </div>
-      `;
+    // Insertar después de la lista de pedidos.
+    ordersList.insertAdjacentElement("afterend", panel);
 
-      head.insertAdjacentElement("afterend", panel);
+    // ========================================
+    // BOTÓN COPIAR DATOS
+    // ========================================
 
-      $("zeroShopMarkAllRead").addEventListener(
-        "click",
-        () => markRead(null)
+    panel.addEventListener("click", async event => {
+
+      const button = event.target.closest(
+        "[data-copy-delivery]"
       );
 
-      $("zeroShopRefreshNotifications").addEventListener(
-        "click",
-        loadNotifications
-      );
+      if (!button) return;
 
-      $("zeroShopNotificationsList").addEventListener(
-        "click",
-        onNotificationClick
-      );
-    }
+      const text = button.dataset.copyDelivery || "";
+
+      try {
+        await navigator.clipboard.writeText(text);
+
+      } catch (_) {
+
+        const area = document.createElement("textarea");
+
+        area.value = text;
+        area.style.position = "fixed";
+        area.style.opacity = "0";
+
+        document.body.appendChild(area);
+
+        area.select();
+
+        document.execCommand("copy");
+
+        area.remove();
+      }
+
+      const original = button.textContent;
+
+      button.textContent = "✓ Copiado";
+
+      setTimeout(() => {
+        button.textContent = original;
+      }, 1600);
+
+    });
+
+    return panel;
   }
 
-  function togglePanel() {
-    const panel = $("zeroShopNotificationsPanel");
+  // ==========================================
+  // CONSULTAR PEDIDOS DEL CLIENTE
+  // ==========================================
+
+  async function loadMyDeliveries(session) {
+
+    if (!session?.user) return;
+
+    if (loading) return;
+
+    currentUserId = session.user.id;
+
+    const panel = ensurePanel();
 
     if (!panel) return;
 
-    panel.hidden = !panel.hidden;
+    panel.hidden = false;
 
-    if (!panel.hidden) loadNotifications();
-  }
-
-  function getIcon(type) {
-    return {
-      order_received: "🛍️",
-      payment_confirmed: "✓",
-      order_delivered: "📦"
-    }[type] || "•";
-  }
-
-  async function loadNotifications() {
-    if (!userId || loading) return;
-
-    ensureUI();
-
-    const list = $("zeroShopNotificationsList");
+    const list = $("myDigitalDeliveriesList");
 
     if (!list) return;
 
     loading = true;
 
+    list.innerHTML = `
+      <div class="my-delivery-empty">
+        Consultando tus pedidos y entregas...
+      </div>
+    `;
+
     try {
-      const { data, error } = await db
-        .from("zero_shop_notifications")
+
+      // IMPORTANTE:
+      // Ya NO filtramos por delivery_method = account.
+      // Ahora aparecen las entregas de WhatsApp y Mi cuenta.
+
+      const { data: orders, error: ordersError } = await db
+        .from("orders")
         .select(`
           id,
-          order_id,
-          notification_type,
-          title,
-          body,
+          order_number,
+          payment_status,
+          delivery_status,
+          delivery_method,
+          delivered_at,
+          total,
           created_at,
-          read_at
+          status
         `)
-        .eq("customer_user_id", userId)
+        .eq("customer_user_id", session.user.id)
         .order("created_at", { ascending: false })
-        .limit(40);
+        .limit(50);
 
-      if (error) throw error;
+      if (ordersError) throw ordersError;
 
-      const rows = data || [];
+      if (!orders?.length) {
 
-      const unread = rows.filter(row => !row.read_at).length;
+        list.innerHTML = `
+          <div class="my-delivery-empty">
+            <div style="font-size:30px">🛍️</div>
 
-      const count = $("zeroShopUnreadCount");
+            Todavía no tienes pedidos vinculados
+            a esta cuenta.
 
-      if (count) {
-        count.textContent = unread > 99 ? "99+" : unread;
-        count.hidden = unread === 0;
-      }
-
-      list.innerHTML = rows.length
-        ? rows.map(row => `
-          <article class="zsn-item ${row.read_at ? "" : "unread"}">
-            <div class="zsn-icon">
-              ${getIcon(row.notification_type)}
-            </div>
-
-            <div class="zsn-copy">
-              <strong>${esc(row.title)}</strong>
-              <p>${esc(row.body)}</p>
-              <small>${formatDate(row.created_at)}</small>
-              <br>
-
-              <button
-                type="button"
-                class="zsn-open"
-                data-zsn-open="${esc(row.id)}"
-                data-zsn-order="${esc(row.order_id || "")}"
-                data-zsn-type="${esc(row.notification_type)}">
-
-                ${row.notification_type === "order_delivered"
-                  ? "Ver mi producto →"
-                  : "Ver mi pedido →"}
-              </button>
-            </div>
-          </article>
-        `).join("")
-        : `
-          <div class="zsn-empty">
-            Todavía no tienes notificaciones.
-            Aquí aparecerán las actualizaciones de tus compras.
+            <br>
+            Cuando realices una compra,
+            aparecerá aquí.
           </div>
         `;
 
+        return;
+      }
+
+      const orderIds = orders.map(order => order.id);
+
+      // ======================================
+      // CONSULTAR PRODUCTOS Y ENTREGAS
+      // ======================================
+
+      const [itemsResult, deliveriesResult] =
+        await Promise.all([
+
+          db.from("order_items")
+            .select(`
+              id,
+              order_id,
+              product_name,
+              product_variant,
+              quantity
+            `)
+            .in("order_id", orderIds)
+            .order("created_at", { ascending: true }),
+
+          db.from("order_deliveries")
+            .select(`
+              order_id,
+              order_item_id,
+              delivery_content,
+              delivered_at
+            `)
+            .in("order_id", orderIds)
+
+        ]);
+
+      if (itemsResult.error) throw itemsResult.error;
+
+      if (deliveriesResult.error) {
+        throw deliveriesResult.error;
+      }
+
+      // ======================================
+      // ORGANIZAR PRODUCTOS POR PEDIDO
+      // ======================================
+
+      const itemsByOrder = new Map();
+
+      (itemsResult.data || []).forEach(item => {
+
+        if (!itemsByOrder.has(item.order_id)) {
+          itemsByOrder.set(item.order_id, []);
+        }
+
+        itemsByOrder.get(item.order_id).push(item);
+
+      });
+
+      // ======================================
+      // ORGANIZAR ENTREGAS POR PRODUCTO
+      // ======================================
+
+      const deliveriesByItem = new Map(
+        (deliveriesResult.data || []).map(row => [
+          row.order_item_id,
+          row
+        ])
+      );
+
+      // ======================================
+      // MOSTRAR TODOS LOS PEDIDOS
+      // ======================================
+
+      list.innerHTML = orders.map(order => {
+
+        const items = itemsByOrder.get(order.id) || [];
+
+        const delivered =
+          order.delivery_status === "delivered";
+
+        const paid =
+          order.payment_status === "paid";
+
+        const cancelled =
+          order.status === "cancelled";
+
+        const method =
+          order.delivery_method === "account"
+            ? "Mi cuenta"
+            : "WhatsApp";
+
+        // ESTADO DEL PEDIDO
+
+        let pill;
+
+        if (cancelled) {
+
+          pill = `
+            <span class="my-delivery-pill">
+              Pedido cancelado
+            </span>
+          `;
+
+        } else if (delivered) {
+
+          pill = `
+            <span class="my-delivery-pill done">
+              ✓ Entregado
+            </span>
+          `;
+
+        } else if (paid) {
+
+          pill = `
+            <span class="my-delivery-pill">
+              Pago confirmado · En preparación
+            </span>
+          `;
+
+        } else {
+
+          pill = `
+            <span class="my-delivery-pill">
+              Pago pendiente
+            </span>
+          `;
+
+        }
+
+        // PRODUCTOS
+
+        const itemsHtml = items.map(item => {
+
+          const delivery = deliveriesByItem.get(item.id);
+
+          const variant = item.product_variant
+            ? " · " + item.product_variant
+            : "";
+
+          return `
+            <div class="my-delivery-product">
+
+              <strong>
+                ${escapeHTML(item.product_name)}
+                ${escapeHTML(variant)}
+              </strong>
+
+              <small>
+                Cantidad: ${Number(item.quantity)}
+              </small>
+
+              ${
+                delivery && delivery.delivery_content
+                  ? `
+
+                    <div class="my-delivery-content">${escapeHTML(
+                      delivery.delivery_content
+                    )}</div>
+
+                    <button
+                      type="button"
+                      class="my-delivery-copy"
+                      data-copy-delivery="${escapeHTML(
+                        delivery.delivery_content
+                      )}">
+
+                      📋 Copiar datos
+
+                    </button>
+
+                    <small>
+                      Entregado:
+                      ${dateTime(
+                        delivery.delivered_at ||
+                        order.delivered_at
+                      )}
+                    </small>
+
+                  `
+                  : `
+
+                    <div class="my-delivery-pending">
+
+                      ${
+                        cancelled
+                          ? "Este pedido fue cancelado. Contacta a la tienda si necesitas ayuda."
+                          : paid
+                            ? "Tu pago está confirmado. La tienda está preparando los datos de entrega."
+                            : "Tu pedido está pendiente de confirmación del pago."
+                      }
+
+                    </div>
+
+                  `
+              }
+
+            </div>
+          `;
+
+        }).join("");
+
+        // TARJETA DEL PEDIDO
+
+        return `
+
+          <article
+            class="my-delivery-order"
+            id="delivery-order-${escapeHTML(order.id)}">
+
+            <div class="my-delivery-head">
+
+              <strong>
+                Pedido ${escapeHTML(order.order_number)}
+              </strong>
+
+              ${pill}
+
+            </div>
+
+            <div class="my-delivery-meta">
+
+              Fecha:
+              ${dateTime(order.created_at)}
+
+              <br>
+
+              Total:
+              ${money(order.total)}
+
+              <br>
+
+              Modalidad:
+              <span class="my-delivery-method">
+                ${method}
+              </span>
+
+            </div>
+
+            ${
+              itemsHtml ||
+              `
+                <div class="my-delivery-empty">
+                  Este pedido no tiene productos registrados.
+                </div>
+              `
+            }
+
+          </article>
+
+        `;
+
+      }).join("");
+
     } catch (error) {
+
+      console.error(
+        "ZERO-SHOP: Error al cargar entregas:",
+        error
+      );
+
       list.innerHTML = `
-        <div class="zsn-empty">
-          No se pudieron cargar las notificaciones:
-          ${esc(error.message)}
+        <div class="my-delivery-empty">
+
+          No fue posible cargar tus productos.
+
+          <br><br>
+
+          ${escapeHTML(
+            error.message || "Error desconocido"
+          )}
+
         </div>
       `;
+
     } finally {
+
       loading = false;
+
     }
   }
 
-  async function markRead(id) {
-    const { error } = await db.rpc(
-      "zero_shop_mark_notification_read",
-      {
-        p_notification_id: id || null
-      }
-    );
+  // ==========================================
+  // RECARGAR ENTREGAS
+  // ==========================================
 
-    if (error) {
-      alert("No se pudo actualizar: " + error.message);
-      return false;
-    }
+  async function refreshDeliveries() {
 
-    await loadNotifications();
-    return true;
-  }
+    if (!currentUserId) return;
 
-  async function onNotificationClick(event) {
-    const button = event.target.closest("[data-zsn-open]");
-
-    if (!button) return;
-
-    const notificationId = button.dataset.zsnOpen;
-    const orderId = button.dataset.zsnOrder;
-    const type = button.dataset.zsnType;
-
-    const success = await markRead(notificationId);
-
-    if (!success) return;
-
-    const panel = $("zeroShopNotificationsPanel");
-    if (panel) panel.hidden = true;
-
-    if (orderId && typeof window.zeroShopOpenDeliveryOrder === "function") {
-      window.zeroShopOpenDeliveryOrder(orderId);
-      return;
-    }
-
-    if (type === "order_delivered") {
-      $("myDigitalDeliveries")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    } else {
-      $("ordersList")?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    }
-  }
-
-  async function start(session) {
-    if (!session?.user) {
-      userId = null;
-
-      if (refreshTimer) clearInterval(refreshTimer);
-
-      refreshTimer = null;
-      return;
-    }
-
-    userId = session.user.id;
-
-    ensureUI();
-
-    await loadNotifications();
-
-    if (refreshTimer) clearInterval(refreshTimer);
-
-    refreshTimer = setInterval(loadNotifications, 30000);
-  }
-
-  async function init() {
     const { data, error } = await db.auth.getSession();
 
-    if (!error) await start(data.session);
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    if (data.session?.user?.id === currentUserId) {
+      await loadMyDeliveries(data.session);
+    }
+  }
+
+  // ==========================================
+  // INICIALIZACIÓN
+  // ==========================================
+
+  async function init() {
+
+    try {
+
+      const { data, error } = await db.auth.getSession();
+
+      if (error) throw error;
+
+      if (data.session?.user) {
+        await loadMyDeliveries(data.session);
+      }
+
+    } catch (error) {
+
+      console.error(
+        "ZERO-SHOP: Error al iniciar entregas:",
+        error
+      );
+
+    }
+
+    // DETECTAR INICIO Y CIERRE DE SESIÓN
 
     db.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        setTimeout(() => start(session), 0);
+
+      if (
+        event === "SIGNED_IN" &&
+        session?.user
+      ) {
+
+        setTimeout(() => {
+          loadMyDeliveries(session);
+        }, 0);
+
       }
 
       if (event === "SIGNED_OUT") {
-        userId = null;
 
-        if (refreshTimer) clearInterval(refreshTimer);
+        currentUserId = null;
 
-        refreshTimer = null;
+        const panel = $("myDigitalDeliveries");
 
-        $("zeroShopNotificationButton")?.remove();
-        $("zeroShopNotificationsPanel")?.remove();
+        if (panel) {
+          panel.hidden = true;
+        }
+
       }
+
     });
+
+    // Permitir que otros scripts soliciten una actualización.
+    document.addEventListener(
+      "zeroShopRefreshDeliveries",
+      refreshDeliveries
+    );
   }
 
   init();
+
 })();
