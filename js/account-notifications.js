@@ -173,7 +173,91 @@
     document.head.appendChild(style);
   }
 
-  function ensureUI() {
+  
+function ensureUI() {
+  addStyles();
+
+  const head = document.querySelector("#dashboard .dash-head");
+
+  if (!head) return;
+
+  const logout = $("logoutBtn");
+
+  // BOTÓN DE NOTIFICACIONES
+  if (!$("zeroShopNotificationButton")) {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.id = "zeroShopNotificationButton";
+    button.className = "zsn-button";
+
+    button.innerHTML = `
+      🔔 Notificaciones
+      <span class="zsn-count" id="zeroShopUnreadCount">0</span>
+    `;
+
+    if (logout) {
+      logout.insertAdjacentElement("beforebegin", button);
+    } else {
+      head.appendChild(button);
+    }
+
+    button.addEventListener("click", togglePanel);
+  }
+
+  // PANEL DE NOTIFICACIONES
+  if (!$("zeroShopNotificationsPanel")) {
+    const panel = document.createElement("section");
+
+    panel.id = "zeroShopNotificationsPanel";
+    panel.className = "zsn-panel";
+    panel.hidden = true;
+
+    panel.innerHTML = `
+      <div class="zsn-head">
+        <h3>🔔 Centro de notificaciones</h3>
+
+        <div class="zsn-actions">
+          <button type="button"
+            class="zsn-small"
+            id="zeroShopMarkAllRead">
+            Marcar todas como leídas
+          </button>
+
+          <button type="button"
+            class="zsn-small"
+            id="zeroShopRefreshNotifications">
+            Actualizar
+          </button>
+        </div>
+      </div>
+
+      <div id="zeroShopNotificationsList" class="zsn-list">
+        <div class="zsn-empty">
+          Cargando notificaciones...
+        </div>
+      </div>
+    `;
+
+    head.insertAdjacentElement("afterend", panel);
+
+    $("zeroShopMarkAllRead").addEventListener(
+      "click",
+      () => markRead(null)
+    );
+
+    $("zeroShopRefreshNotifications").addEventListener(
+      "click",
+      loadNotifications
+    );
+
+    $("zeroShopNotificationsList").addEventListener(
+      "click",
+      onNotificationClick
+    );
+  }
+}
+
     addStyles();
 
     const head = document.querySelector(
