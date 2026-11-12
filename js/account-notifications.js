@@ -6,7 +6,7 @@
   const $ = id => document.getElementById(id);
 
   if (!db) {
-    console.error("ZERO-SHOP: Supabase no está disponible.");
+    console.error("ZERO-SHOP: Supabase no disponible.");
     return;
   }
 
@@ -189,25 +189,29 @@
   }
 
   // =====================================
-  // CREAR BOTÓN Y PANEL
+  // CREAR INTERFAZ
   // =====================================
 
   function ensureUI() {
     addStyles();
 
-    const dashboard = $("dashboard");
-    const head = dashboard?.querySelector(".dash-head");
+    // IMPORTANTE: TU HTML UTILIZA accountView
+    const dashboard = $("accountView");
 
-    if (!dashboard || !head) {
-      return false;
-    }
+    if (!dashboard) return false;
 
+    const head = dashboard.querySelector(
+      ".account-dashboard-head"
+    );
+
+    if (!head) return false;
+
+    const actions = head.querySelector(".dash-actions");
     const logout = $("logoutBtn");
 
-    // BOTÓN
+    // BOTÓN DE NOTIFICACIONES
 
     if (!$("zeroShopNotificationButton")) {
-
       const button = document.createElement("button");
 
       button.type = "button";
@@ -224,8 +228,10 @@
         </span>
       `;
 
-      if (logout) {
-        logout.insertAdjacentElement("beforebegin", button);
+      if (actions && logout) {
+        actions.insertBefore(button, logout);
+      } else if (actions) {
+        actions.appendChild(button);
       } else {
         head.appendChild(button);
       }
@@ -236,7 +242,6 @@
     // PANEL
 
     if (!$("zeroShopNotificationsPanel")) {
-
       const panel = document.createElement("section");
 
       panel.id = "zeroShopNotificationsPanel";
@@ -265,7 +270,6 @@
             </button>
 
           </div>
-
         </div>
 
         <div
@@ -301,11 +305,10 @@
   }
 
   // =====================================
-  // ABRIR Y CERRAR NOTIFICACIONES
+  // ABRIR PANEL
   // =====================================
 
   function togglePanel() {
-
     const panel = $("zeroShopNotificationsPanel");
 
     if (!panel) return;
@@ -322,21 +325,18 @@
   // =====================================
 
   function getIcon(type) {
-
     return {
       order_received: "🛍️",
       payment_confirmed: "✓",
       order_delivered: "📦"
     }[type] || "•";
-
   }
 
   // =====================================
-  // CONSULTAR NOTIFICACIONES
+  // CARGAR NOTIFICACIONES
   // =====================================
 
   async function loadNotifications() {
-
     if (!userId || loading) return;
 
     if (!ensureUI()) return;
@@ -348,7 +348,6 @@
     loading = true;
 
     try {
-
       const { data, error } = await db
         .from("zero_shop_notifications")
         .select(`
@@ -377,7 +376,6 @@
       const count = $("zeroShopUnreadCount");
 
       if (count) {
-
         count.textContent =
           unread > 99 ? "99+" : String(unread);
 
@@ -385,9 +383,7 @@
       }
 
       list.innerHTML = rows.length
-
         ? rows.map(row => `
-
           <article class="zsn-item ${
             row.read_at ? "" : "unread"
           }">
@@ -398,13 +394,9 @@
 
             <div class="zsn-copy">
 
-              <strong>
-                ${esc(row.title)}
-              </strong>
+              <strong>${esc(row.title)}</strong>
 
-              <p>
-                ${esc(row.body)}
-              </p>
+              <p>${esc(row.body)}</p>
 
               <small>
                 ${formatDate(row.created_at)}
@@ -427,51 +419,29 @@
               </button>
 
             </div>
-
           </article>
-
         `).join("")
-
         : `
-
           <div class="zsn-empty">
-
             Todavía no tienes notificaciones.
-
             <br>
-
             Aquí aparecerán las actualizaciones
             de tus compras.
-
           </div>
-
         `;
 
     } catch (error) {
-
-      console.error(
-        "ZERO-SHOP: Error al consultar notificaciones:",
-        error
-      );
+      console.error("Error de notificaciones:", error);
 
       list.innerHTML = `
-
         <div class="zsn-empty">
-
           No se pudieron cargar las notificaciones.
-
           <br><br>
-
           ${esc(error.message)}
-
         </div>
-
       `;
-
     } finally {
-
       loading = false;
-
     }
   }
 
@@ -480,7 +450,6 @@
   // =====================================
 
   async function markRead(id) {
-
     const { error } = await db.rpc(
       "zero_shop_mark_notification_read",
       {
@@ -489,14 +458,9 @@
     );
 
     if (error) {
-
-      console.error(error);
-
       alert(
-        "No se pudo actualizar la notificación: " +
-        error.message
+        "No se pudo actualizar: " + error.message
       );
-
       return false;
     }
 
@@ -506,11 +470,10 @@
   }
 
   // =====================================
-  // ACCIONES DE NOTIFICACIONES
+  // VER PEDIDO O PRODUCTO
   // =====================================
 
   async function onNotificationClick(event) {
-
     const button = event.target.closest(
       "[data-zsn-open]"
     );
@@ -519,50 +482,40 @@
 
     const type = button.dataset.zsnType;
 
-    const notificationId = button.dataset.zsnOpen;
-
-    const success = await markRead(notificationId);
+    const success = await markRead(
+      button.dataset.zsnOpen
+    );
 
     if (!success) return;
 
     if (type === "order_delivered") {
-
       const deliveries = $("myDigitalDeliveries");
 
       if (deliveries) {
-
         deliveries.scrollIntoView({
           behavior: "smooth",
           block: "start"
         });
-
       } else {
-
         $("ordersList")?.scrollIntoView({
           behavior: "smooth",
           block: "start"
         });
-
       }
-
     } else {
-
       $("ordersList")?.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
-
     }
   }
 
   // =====================================
-  // INICIAR SESIÓN DEL CLIENTE
+  // INICIAR SESIÓN
   // =====================================
 
   async function start(session) {
-
     if (!session?.user) {
-
       userId = null;
 
       if (refreshTimer) {
@@ -584,51 +537,31 @@
       clearInterval(refreshTimer);
     }
 
-    // ACTUALIZAR CADA 45 SEGUNDOS
-
     refreshTimer = setInterval(() => {
-
-      if (userId) {
-        loadNotifications();
-      }
-
+      if (userId) loadNotifications();
     }, 45000);
-
   }
 
   // =====================================
-  // INICIALIZACIÓN
+  // INICIALIZAR
   // =====================================
 
   async function init() {
-
     try {
-
       const { data, error } = await db.auth.getSession();
 
       if (error) throw error;
 
       if (data.session?.user) {
-
         await start(data.session);
-
       }
 
       db.auth.onAuthStateChange((event, session) => {
-
-        if (
-          event === "SIGNED_IN" &&
-          session?.user
-        ) {
-
-          setTimeout(() => {
-            start(session);
-          }, 100);
-
+        if (event === "SIGNED_IN" && session?.user) {
+          setTimeout(() => start(session), 100);
         }
 
         if (event === "SIGNED_OUT") {
-
           userId = null;
 
           if (refreshTimer) {
@@ -638,22 +571,16 @@
           refreshTimer = null;
 
           $("zeroShopNotificationButton")?.remove();
-
           $("zeroShopNotificationsPanel")?.remove();
-
         }
-
       });
 
     } catch (error) {
-
       console.error(
         "ZERO-SHOP: Error al iniciar notificaciones:",
         error
       );
-
     }
-
   }
 
   init();
